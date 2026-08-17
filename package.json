@@ -1,0 +1,27 @@
+{
+  "name": "personal-os",
+  "version": "1.0.0",
+  "description": "Personal OS - Productivity system that answers 'What should I do now?'",
+  "type": "module",
+  "main": "backend/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node backend/server.js",
+    "client": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.8.0",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.3",
+    "vite": "^4.4.9",
+    "concurrently": "^8.2.0"
+  }
+}
