@@ -1,56 +1,42 @@
-import React, { useState, useRef, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { completeTask, updateTask, deleteTask } from '../api/api';
+import React, { useState, useRef, useEffect } from "react";
+import ReactDOM from "react-dom";
+import RescheduleModal from "./RescheduleModal";
+import { completeTask, updateTask, deleteTask } from "../api/api";
 
 export default function TaskItem({ task, onCompleted, showDelete = false }) {
   const [completing, setCompleting] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showReschedule, setShowReschedule] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const btnRef = useRef(null);
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (showMenu && btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setMenuPos({
-        top: rect.bottom + window.scrollY + 5,
-        left: rect.left + window.scrollX - 150,
-      });
+      const newPos = {
+        top: rect.bottom + 10,
+        left: rect.left - 140,
+      };
+      setMenuPos(newPos);
     }
-  }, [showMenu]); */
-
-  useEffect(() => {
-  if (showMenu && btnRef.current) {
-    const rect = btnRef.current.getBoundingClientRect();
-    const pos = {
-      top: rect.bottom + window.scrollY + 5,
-      left: rect.left + window.scrollX - 150,
-    };
-    console.log('Menu position:', pos);
-    console.log('Button rect:', rect);
-    console.log('Window scroll:', { scrollX: window.scrollX, scrollY: window.scrollY });
-    setMenuPos(pos);
-  }
-}, [showMenu]);
+  }, [showMenu]);
 
   const toggleMenu = () => {
-    console.log('Toggle menu for:', task.title);
-    setShowMenu(prev => !prev);
+    setShowMenu((prev) => !prev);
   };
 
   const closeMenu = () => {
-    console.log('Close menu');
     setShowMenu(false);
   };
 
   const handleComplete = async () => {
     try {
       setCompleting(true);
-      console.log('Completing task:', task.id);
       await completeTask(task.id);
       onCompleted();
     } catch (err) {
-      console.error('Error completing:', err);
+      console.error("Error:", err);
     } finally {
       setCompleting(false);
     }
@@ -59,12 +45,11 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
   const handleRestore = async () => {
     try {
       setCompleting(true);
-      console.log('Restoring task:', task.id);
-      await updateTask(task.id, { status: 'pending', completed_at: null });
+      await updateTask(task.id, { status: "pending", completed_at: null });
       closeMenu();
       onCompleted();
     } catch (err) {
-      console.error('Error restoring:', err);
+      console.error("Error:", err);
     } finally {
       setCompleting(false);
     }
@@ -73,44 +58,45 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
   const handleArchive = async () => {
     try {
       setCompleting(true);
-      console.log('Archiving task:', task.id);
-      await updateTask(task.id, { status: 'archived' });
+      await updateTask(task.id, { status: "archived" });
       closeMenu();
       onCompleted();
     } catch (err) {
-      console.error('Error archiving:', err);
+      console.error("Error:", err);
     } finally {
       setCompleting(false);
     }
   };
 
-  const handleReschedule = async () => {
-    const newDate = prompt('New due date:', task.due_at || '');
-    if (newDate !== null) {
-      try {
-        setCompleting(true);
-        console.log('Rescheduling task:', task.id);
-        await updateTask(task.id, { due_at: newDate || null });
-        closeMenu();
-        onCompleted();
-      } catch (err) {
-        console.error('Error rescheduling:', err);
-      } finally {
-        setCompleting(false);
-      }
+  const handleRescheduleClick = () => {
+    closeMenu();
+    setShowReschedule(true);
+  };
+
+  const handleRescheduleConfirm = async (newDateTime) => {
+    try {
+      setCompleting(true);
+      await updateTask(task.id, { due_at: newDateTime || null });
+      setShowReschedule(false);
+      onCompleted();
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Failed to reschedule task");
+    } finally {
+      setCompleting(false);
     }
   };
 
   const handleDelete = async () => {
     try {
       setCompleting(true);
-      console.log('Deleting task:', task.id);
       await deleteTask(task.id);
       closeMenu();
       setShowConfirm(false);
       onCompleted();
     } catch (err) {
-      console.error('Error deleting:', err);
+      console.error("Error:", err);
+      alert("Failed to delete task");
     } finally {
       setCompleting(false);
     }
@@ -118,43 +104,45 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
 
   const isOverdue = task.due_at && new Date(task.due_at) < new Date();
 
-  console.log('Rendering task:', task.title, 'showMenu:', showMenu);
-
   return (
     <>
-      <div className={`task-item ${task.status} ${isOverdue ? 'overdue' : ''}`}>
+      <div className={`task-item ${task.status} ${isOverdue ? "overdue" : ""}`}>
         <div className="task-checkbox">
-          {task.status === 'pending' && (
+          {task.status === "pending" && (
             <button
               className="checkbox-btn"
               onClick={handleComplete}
               disabled={completing}
             >
-              {completing ? '...' : '○'}
+              {completing ? "..." : "○"}
             </button>
           )}
-          {task.status === 'completed' && <div className="checkbox-completed">✓</div>}
-          {task.status === 'archived' && <div className="checkbox-archived">📦</div>}
+          {task.status === "completed" && (
+            <div className="checkbox-completed">✓</div>
+          )}
+          {task.status === "archived" && (
+            <div className="checkbox-archived">📦</div>
+          )}
         </div>
 
         <div className="task-content">
-          <div className={`task-title ${task.status === 'completed' ? 'completed' : ''}`}>
+          <div
+            className={`task-title ${task.status === "completed" ? "completed" : ""}`}
+          >
             {task.title}
           </div>
           <div className="task-meta">
             <span className="meta-category">{task.category}</span>
             {task.estimated_minutes && (
-              <span className="meta-duration">· {task.estimated_minutes} min</span>
+              <span className="meta-duration">
+                · {task.estimated_minutes} min
+              </span>
             )}
           </div>
         </div>
 
         <div className="task-actions">
-          <button
-            ref={btnRef}
-            className="task-menu-btn"
-            onClick={toggleMenu}
-          >
+          <button ref={btnRef} className="task-menu-btn" onClick={toggleMenu}>
             ⋮
           </button>
         </div>
@@ -164,7 +152,7 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
         </div>
       </div>
 
-      {showMenu ? (
+      {showMenu &&
         ReactDOM.createPortal(
           <>
             <div className="menu-overlay" onClick={closeMenu} />
@@ -175,9 +163,9 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
                 left: `${menuPos.left}px`,
               }}
             >
-              {task.status === 'pending' && (
+              {task.status === "pending" && (
                 <>
-                  <button className="menu-item" onClick={handleReschedule}>
+                  <button className="menu-item" onClick={handleRescheduleClick}>
                     📅 Reschedule
                   </button>
                   <button className="menu-item" onClick={handleArchive}>
@@ -185,25 +173,31 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
                   </button>
                 </>
               )}
-              {task.status === 'completed' && (
+              {task.status === "completed" && (
                 <>
                   <button className="menu-item" onClick={handleRestore}>
                     ↩️ Restore
                   </button>
                   {showDelete && (
-                    <button className="menu-item delete-btn" onClick={() => setShowConfirm(true)}>
+                    <button
+                      className="menu-item delete-btn"
+                      onClick={() => setShowConfirm(true)}
+                    >
                       ❌ Delete
                     </button>
                   )}
                 </>
               )}
-              {task.status === 'archived' && (
+              {task.status === "archived" && (
                 <>
                   <button className="menu-item" onClick={handleRestore}>
                     ↩️ Restore
                   </button>
                   {showDelete && (
-                    <button className="menu-item delete-btn" onClick={() => setShowConfirm(true)}>
+                    <button
+                      className="menu-item delete-btn"
+                      onClick={() => setShowConfirm(true)}
+                    >
                       ❌ Delete
                     </button>
                   )}
@@ -211,30 +205,46 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
               )}
             </div>
           </>,
-          document.body
-        )
-      ) : null}
+          document.body,
+        )}
 
-      {showConfirm ? (
+      {showReschedule && (
+        <RescheduleModal
+          task={task}
+          onConfirm={handleRescheduleConfirm}
+          onCancel={() => setShowReschedule(false)}
+        />
+      )}
+
+      {showConfirm &&
         ReactDOM.createPortal(
           <>
-            <div className="confirm-overlay" onClick={() => setShowConfirm(false)} />
+            <div
+              className="confirm-overlay"
+              onClick={() => setShowConfirm(false)}
+            />
             <div className="confirm-dialog">
               <h3>Delete Task?</h3>
               <p>This cannot be undone.</p>
               <div className="confirm-actions">
-                <button className="btn btn-primary" onClick={handleDelete}>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleDelete}
+                  disabled={completing}
+                >
                   Delete
                 </button>
-                <button className="btn btn-secondary" onClick={() => setShowConfirm(false)}>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setShowConfirm(false)}
+                >
                   Cancel
                 </button>
               </div>
             </div>
           </>,
-          document.body
-        )
-      ) : null}
+          document.body,
+        )}
     </>
   );
 }

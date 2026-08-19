@@ -21,7 +21,9 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
@@ -704,45 +706,48 @@ body {
 }
 
 .task-menu-portal {
-  position: fixed;
-  background-color: var(--bg-secondary);
-  border: 2px solid var(--accent-red);
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  position: fixed !important;
+  background-color: var(--bg-secondary) !important;
+  border: 2px solid var(--accent-blue) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
   z-index: 9999 !important;
-  min-width: 160px;
-  padding: 0;
-  margin: 0;
+  min-width: 160px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .task-menu-portal .menu-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  color: var(--text-primary);
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: var(--transition);
-  font-family: inherit;
-  border-bottom: 1px solid var(--border-color);
-  margin: 0;
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+  background: none !important;
+  border: none !important;
+  color: var(--text-primary) !important;
+  padding: 0.75rem 1rem !important;
+  cursor: pointer !important;
+  font-size: 0.875rem !important;
+  transition: var(--transition) !important;
+  font-family: inherit !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  margin: 0 !important;
 }
 
 .task-menu-portal .menu-item:last-child {
-  border-bottom: none;
+  border-bottom: none !important;
 }
 
 .task-menu-portal .menu-item:hover:not(:disabled) {
-  background-color: var(--bg-tertiary);
-  color: var(--accent-blue);
+  background-color: var(--bg-tertiary) !important;
+  color: var(--accent-blue) !important;
 }
 
 .task-menu-portal .menu-item:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
 }
 
 .delete-btn {
@@ -1148,7 +1153,6 @@ body {
   }
 }
 
-
 /* Debug: Make menu visible */
 .task-menu-portal {
   min-height: 40px;
@@ -1158,4 +1162,77 @@ body {
   min-height: 40px;
   display: flex;
   align-items: center;
+}
+
+/* Reschedule Modal */
+.reschedule-modal {
+  max-width: 500px;
+}
+
+.modal-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.reschedule-modal .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.reschedule-modal .form-label {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.reschedule-modal .form-input {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+}
+
+.reschedule-modal .form-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(79, 158, 255, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-direction: column;
+}
+
+.modal-actions .btn {
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .modal-actions {
+    flex-direction: row;
+  }
+
+  .modal-actions .btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirm-dialog {
+    min-width: calc(100% - 2rem);
+    max-width: 100%;
+    margin: auto;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
+
+  .reschedule-modal .form-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
 }
