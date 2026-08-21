@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { completeTask, updateTask } from '../api/api';
-import { getReasonForScore } from '../domain/taskHelpers';
+import { getLocalizedTaskContent } from '../i18n/taskSamples';
+
+const DATE_LOCALE_BY_LANGUAGE = {
+  en: 'en-US',
+  de: 'de-DE',
+  it: 'it-IT',
+  fr: 'fr-FR',
+  es: 'es-ES',
+};
 
 export default function FocusTask({ task, onCompleted }) {
+  const { t, i18n } = useTranslation();
   const [completing, setCompleting] = useState(false);
   const [showEditPanel, setShowEditPanel] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -16,6 +26,10 @@ export default function FocusTask({ task, onCompleted }) {
   });
   const [error, setError] = useState(null);
 
+  const currentLanguage = DATE_LOCALE_BY_LANGUAGE[i18n.resolvedLanguage] ? i18n.resolvedLanguage : 'en';
+  const dateLocale = DATE_LOCALE_BY_LANGUAGE[currentLanguage] || 'en-US';
+  const localizedTask = getLocalizedTaskContent(task, t);
+
   const handleComplete = async () => {
     try {
       setCompleting(true);
@@ -23,7 +37,7 @@ export default function FocusTask({ task, onCompleted }) {
       onCompleted();
     } catch (err) {
       console.error('Error completing task:', err);
-      setError('Failed to complete task');
+      setError(t('focus.failedComplete'));
     } finally {
       setCompleting(false);
     }
@@ -31,7 +45,7 @@ export default function FocusTask({ task, onCompleted }) {
 
   const handleSaveEdit = async () => {
     if (!editData.title.trim()) {
-      setError('Title is required');
+      setError(t('quickCapture.titleRequired'));
       return;
     }
 
@@ -50,7 +64,7 @@ export default function FocusTask({ task, onCompleted }) {
       onCompleted();
     } catch (err) {
       console.error('Error updating task:', err);
-      setError('Failed to update task');
+      setError(t('focus.failedUpdate'));
     } finally {
       setCompleting(false);
     }
@@ -64,16 +78,16 @@ export default function FocusTask({ task, onCompleted }) {
       onCompleted();
     } catch (err) {
       console.error('Error archiving task:', err);
-      setError('Failed to archive task');
+      setError(t('focus.failedArchive'));
     } finally {
       setCompleting(false);
     }
   };
 
   const formatTime = (isoString) => {
-    if (!isoString) return 'No due time';
+    if (!isoString) return t('focus.noDueTime');
     const date = new Date(isoString);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' });
   };
 
   const formatDueDate = (isoString) => {
@@ -84,12 +98,56 @@ export default function FocusTask({ task, onCompleted }) {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     if (date.toDateString() === today.toDateString()) {
-      return 'Due today at ' + formatTime(isoString);
+      return t('focus.dueTodayAt', { time: formatTime(isoString) });
     } else if (date.toDateString() === tomorrow.toDateString()) {
-      return 'Due tomorrow at ' + formatTime(isoString);
+      return t('focus.dueTomorrowAt', { time: formatTime(isoString) });
     } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' at ' + formatTime(isoString);
+      return t('focus.dueDateAt', {
+        date: date.toLocaleDateString(dateLocale, { month: 'short', day: 'numeric' }),
+        time: formatTime(isoString),
+      });
     }
+  };
+
+  const getReasonForScore = (currentTask) => {
+    const reasons = [];
+    const now = new Date();
+
+    if (currentTask.priority === 'high') {
+      reasons.push(t('focus.reasons.highPriority'));
+    } else if (currentTask.priority === 'medium') {
+      reasons.push(t('focus.reasons.mediumPriority'));
+    }
+
+    if (currentTask.due_at) {
+      const dueDate = new Date(currentTask.due_at);
+      const diffMs = dueDate - now;
+      const diffMins = diffMs / (1000 * 60);
+
+      if (diffMs < 0) {
+        reasons.push(t('focus.reasons.overdueImmediate'));
+      } else if (diffMins <= 30) {
+        reasons.push(t('focus.reasons.deadline30'));
+      } else if (diffMins <= 120) {
+        reasons.push(t('focus.reasons.deadline2h'));
+      } else if (diffMins <= 24 * 60) {
+        reasons.push(t('focus.reasons.dueToday'));
+      }
+    }
+
+    if (currentTask.escalation_level > 0) {
+      reasons.push(t('focus.reasons.escalationLevel', { level: currentTask.escalation_level }));
+    }
+
+    if (currentTask.created_at) {
+      const createdDate = new Date(currentTask.created_at);
+      const ageDays = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+      if (ageDays > 3) {
+        reasons.push(t('focus.reasons.pendingDays', { days: ageDays }));
+      }
+    }
+
+    return reasons.length > 0 ? reasons : [t('focus.reasons.selectedForFocus')];
   };
 
   const reasons = getReasonForScore(task);
@@ -98,79 +156,79 @@ export default function FocusTask({ task, onCompleted }) {
     return (
       <section className="focus-section">
         <div className="focus-header">
-          <h2>EDIT TASK</h2>
+          <h2>{t('focus.editTask')}</h2>
         </div>
         
         <div className="focus-card edit-panel">
           <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(); }}>
             <div className="form-group">
-              <label className="form-label">Title *</label>
+              <label className="form-label">{t('focus.titleRequiredLabel')}</label>
               <input
                 type="text"
                 value={editData.title}
                 onChange={(e) => setEditData({ ...editData, title: e.target.value })}
                 className="form-input"
-                placeholder="Task title"
+                placeholder={t('focus.taskTitlePlaceholder')}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Description</label>
+              <label className="form-label">{t('focus.description')}</label>
               <textarea
                 value={editData.description}
                 onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                 className="form-textarea"
-                placeholder="Task description (optional)"
+                placeholder={t('focus.taskDescriptionPlaceholder')}
                 rows="3"
               />
             </div>
 
             <div className="form-grid">
               <div className="form-group">
-                <label className="form-label">Category</label>
+                <label className="form-label">{t('focus.category')}</label>
                 <select
                   value={editData.category}
                   onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                   className="form-select"
                 >
-                  <option value="Personal">Personal</option>
-                  <option value="Professional">Professional</option>
-                  <option value="Family">Family</option>
-                  <option value="Home">Home</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Shopping">Shopping</option>
-                  <option value="Health">Health</option>
-                  <option value="Other">Other</option>
+                  <option value="Personal">{t('categories.Personal')}</option>
+                  <option value="Professional">{t('categories.Professional')}</option>
+                  <option value="Family">{t('categories.Family')}</option>
+                  <option value="Home">{t('categories.Home')}</option>
+                  <option value="Finance">{t('categories.Finance')}</option>
+                  <option value="Shopping">{t('categories.Shopping')}</option>
+                  <option value="Health">{t('categories.Health')}</option>
+                  <option value="Other">{t('categories.Other')}</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Priority</label>
+                <label className="form-label">{t('focus.priority')}</label>
                 <select
                   value={editData.priority}
                   onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
                   className="form-select"
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
+                  <option value="low">{t('priorities.low')}</option>
+                  <option value="medium">{t('priorities.medium')}</option>
+                  <option value="high">{t('priorities.high')}</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Est. Minutes</label>
+                <label className="form-label">{t('focus.estMinutes')}</label>
                 <input
                   type="number"
                   value={editData.estimated_minutes}
                   onChange={(e) => setEditData({ ...editData, estimated_minutes: e.target.value })}
                   className="form-input"
-                  placeholder="Minutes"
+                  placeholder={t('quickCapture.minutes')}
                   min="1"
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Due Date & Time</label>
+                <label className="form-label">{t('focus.dueDateTime')}</label>
                 <input
                   type="datetime-local"
                   value={editData.due_at}
@@ -188,7 +246,7 @@ export default function FocusTask({ task, onCompleted }) {
                 className="btn btn-primary"
                 disabled={completing}
               >
-                {completing ? 'Saving...' : '✓ Save'}
+                {completing ? t('focus.saving') : `✓ ${t('header.save')}`}
               </button>
               <button 
                 type="button"
@@ -198,7 +256,7 @@ export default function FocusTask({ task, onCompleted }) {
                   setError(null);
                 }}
               >
-                Cancel
+                {t('header.cancel')}
               </button>
             </div>
           </form>
@@ -210,17 +268,17 @@ export default function FocusTask({ task, onCompleted }) {
   return (
     <section className="focus-section">
       <div className="focus-header">
-        <h2>DO NOW</h2>
+        <h2>{t('focus.doNow')}</h2>
       </div>
       
       <div className="focus-card">
         <div className="focus-header-row">
-          <h3 className="focus-title">{task.title}</h3>
+          <h3 className="focus-title">{localizedTask.title}</h3>
           <div className="focus-menu-container">
             <button
               className="focus-menu-btn"
               onClick={() => setShowMenu(!showMenu)}
-              title="More options"
+              title={t('focus.moreOptions')}
             >
               ⋮
             </button>
@@ -232,14 +290,14 @@ export default function FocusTask({ task, onCompleted }) {
                     className="menu-item"
                     onClick={() => setShowEditPanel(true)}
                   >
-                    ✏️ Edit Task
+                    ✏️ {t('focus.editTask')}
                   </button>
                   <button 
                     className="menu-item"
                     onClick={handleArchive}
                     disabled={completing}
                   >
-                    🗑️ Archive
+                    🗑️ {t('focus.archive')}
                   </button>
                 </div>
               </>
@@ -249,9 +307,9 @@ export default function FocusTask({ task, onCompleted }) {
         
         <div className="focus-meta">
           <div className="meta-row">
-            <span className="meta-category">{task.category}</span>
+            <span className="meta-category">{t(`categories.${task.category}`, { defaultValue: task.category })}</span>
             {task.estimated_minutes && (
-              <span className="meta-duration">· {task.estimated_minutes} min</span>
+              <span className="meta-duration">· {task.estimated_minutes} {t('quickCapture.minutes')}</span>
             )}
           </div>
           {task.due_at && (
@@ -259,18 +317,18 @@ export default function FocusTask({ task, onCompleted }) {
           )}
         </div>
 
-        {task.description && (
-          <p className="focus-description">{task.description}</p>
+        {localizedTask.description && (
+          <p className="focus-description">{localizedTask.description}</p>
         )}
 
         <div className="focus-priority">
           <span className={`priority-badge priority-${task.priority}`}>
-            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+            {t('focus.priorityBadge', { priority: t(`priorities.${task.priority}`) })}
           </span>
         </div>
 
         <div className="focus-reasoning">
-          <div className="reasoning-header">Why this task?</div>
+          <div className="reasoning-header">{t('focus.whyThisTask')}</div>
           <ul className="reasoning-list">
             {reasons.map((reason, idx) => (
               <li key={idx}>{reason}</li>
@@ -286,7 +344,7 @@ export default function FocusTask({ task, onCompleted }) {
             onClick={handleComplete}
             disabled={completing}
           >
-            {completing ? 'Completing...' : '✓ Done'}
+            {completing ? t('focus.completing') : `✓ ${t('mobile.done')}`}
           </button>
         </div>
       </div>

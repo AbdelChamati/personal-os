@@ -1,12 +1,12 @@
-# Personal OS
+# Personal Reminder OS
 
 A personal operating system for productivity that answers: **"What should I do now?"**
 
-Personal OS captures obligations, evaluates urgency/importance, selects the next best action, tracks completion, handles deadlines/expiration, and is architected for future integrations with notifications, AI, UiPath, Power Automate, calendar systems, and more.
+Personal Reminder OS captures obligations, evaluates urgency/importance, selects the next best action, tracks completion, handles deadlines/expiration, and is architected for future integrations with notifications, AI, UiPath, Power Automate, calendar systems, and more.
 
 ## Features
 
-### Phase 1 (Current MVP)
+### Current MVP
 - ✅ Smart task prioritization with deterministic scoring
 - ✅ "DO NOW" engine - prominently displays the highest-scoring task
 - ✅ Today dashboard with stats and next 4-6 tasks
@@ -20,7 +20,13 @@ Personal OS captures obligations, evaluates urgency/importance, selects the next
 - ✅ Automation framework with provider abstraction
 - ✅ Responsive mobile-first design
 - ✅ Local-first SQLite database
-- ✅ Dark modern UI
+- ✅ Light and dark themes
+- ✅ Natural-language quick capture (date/time, priority, minutes hints)
+- ✅ Sticky mobile quick actions
+- ✅ Backup export/import (JSON)
+- ✅ Export options: Save As, Share, Copy JSON
+- ✅ Multilingual UI (EN, DE, IT, FR, ES)
+- ✅ Header language switcher with persisted preference
 
 ## Architecture
 
@@ -37,10 +43,12 @@ Personal OS captures obligations, evaluates urgency/importance, selects the next
 ### Frontend
 - **React** - Component-based UI
 - **Vite** - Fast dev server and bundler
+- **i18next + react-i18next** - UI internationalization
 - **src/api/** - Centralized API client
 - **src/domain/** - Pure business logic helpers
 - **src/components/** - Reusable UI components
 - **src/views/** - Page-level components
+- **src/i18n/** - Translation setup and locale dictionaries
 
 ### Database
 - **tasks** - Core task data with scoring factors
@@ -62,8 +70,11 @@ npm install
 npm run dev
 ```
 
-Frontend will be available at `http://localhost:5173`  
-Backend runs on `http://localhost:3000`
+Default ports in this repository:
+- Frontend: `http://localhost:5174`
+- Backend: `http://localhost:3001`
+
+If `npm run dev` fails with `EADDRINUSE`, another process is already using one of these ports.
 
 ## npm Commands
 
@@ -89,6 +100,8 @@ GET    /api/tasks/:id       - Get single task
 POST   /api/tasks           - Create task
 PATCH  /api/tasks/:id       - Update task
 DELETE /api/tasks/:id       - Delete task
+GET    /api/tasks/export    - Export backup tasks (JSON)
+POST   /api/tasks/import    - Import backup tasks (JSON)
 ```
 
 ### Today
@@ -272,16 +285,88 @@ Even in local MVP mode:
 
 The application uses ES Modules exclusively (no CommonJS). All imports use `import` syntax.
 
+### Best Practices Used in This Project
+
+- Keep route handlers small and deterministic. Move non-trivial logic to `backend/services`.
+- Keep UI text and display formatting out of business logic.
+- Validate all API inputs server-side, even if frontend already validates.
+- Prefer clear error messages that are actionable for users and developers.
+- Keep comments short and meaningful. Explain "why", not obvious "what".
+- Add minimal but targeted logs around API boundaries and failures.
+
+### Debugging Checklist
+
 ```bash
 # Install dependencies
 npm install
 
-# Start development
+# Run frontend + backend
 npm run dev
 
-# Build for production
+# Run frontend only
+npm run client
+
+# Run backend only
+npm run server
+
+# Build production bundle
 npm run build
 ```
+
+If ports are busy, stop listeners on current defaults (`3001`, `5174`) and restart.
+
+## Internationalization (EN, DE, IT, FR, ES)
+
+### Recommended Approach
+
+Use a structured i18n layer in the frontend instead of hardcoded text literals.
+
+- Library: `i18next` + `react-i18next`
+- Message organization: one JSON per locale (`en.json`, `de.json`, `it.json`, `fr.json`, `es.json`)
+- Namespace by domain (`header`, `tasks`, `capture`, `backup`, `errors`)
+- Persist user language in localStorage
+- Lazy-load locale bundles to keep startup fast
+
+### Implemented in This Repository
+
+- i18n bootstrap: `src/i18n/index.js`
+- Locale files:
+  - `src/i18n/locales/en.json`
+  - `src/i18n/locales/de.json`
+  - `src/i18n/locales/it.json`
+  - `src/i18n/locales/fr.json`
+  - `src/i18n/locales/es.json`
+- Header language switcher (EN/DE/IT/FR/ES) with localStorage persistence
+- Main UI translated for:
+  - Header and theme controls
+  - Today filters and empty states
+  - Backup export/import modal and feedback
+  - Quick Capture labels and messages
+
+### Adding New Text Safely
+
+1. Add a key in `src/i18n/locales/en.json`
+2. Add equivalent keys in `de.json`, `it.json`, `fr.json`, and `es.json`
+3. Use `t('your.key')` in the component
+4. Keep stable key names so refactors are easy and debug traces remain clear
+
+### Language Switcher UX
+
+Best practice is a **globe icon + language code** (`EN`, `DE`, `IT`, `FR`, `ES`) in the header.
+
+- Avoid country flags as primary language selectors
+- Reason: one language can map to many countries, and flags can be ambiguous
+- Good label examples: `EN`, `DE`, `IT`, `FR`, `ES`
+
+Suggested header pattern:
+
+- `🌐 EN` (click/tap opens language list)
+- Options: `English`, `Deutsch`, `Italiano`, `Français`, `Español`
+
+### Backend i18n Notes
+
+Backend can remain language-neutral for now (status codes + stable error keys).
+Later, expose translated user-facing messages in frontend only, mapped from API error keys.
 
 ## License
 

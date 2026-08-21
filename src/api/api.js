@@ -61,3 +61,28 @@ export async function deleteTask(id) {
   });
   if (!response.ok) throw new Error('Failed to delete task');
 }
+
+export async function exportTasks() {
+  const tasksResponse = await fetch(`${API_BASE}/tasks`);
+  if (!tasksResponse.ok) throw new Error('Failed to export tasks');
+  const tasks = await tasksResponse.json();
+  return {
+    version: 1,
+    exported_at: new Date().toISOString(),
+    count: Array.isArray(tasks) ? tasks.length : 0,
+    tasks: Array.isArray(tasks) ? tasks : [],
+  };
+}
+
+export async function importTasks(payload) {
+  const response = await fetch(`${API_BASE}/tasks/import`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to import tasks');
+  }
+  return response.json();
+}

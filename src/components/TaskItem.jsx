@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
+import { useTranslation } from "react-i18next";
 import RescheduleModal from "./RescheduleModal";
 import { completeTask, updateTask, deleteTask } from "../api/api";
+import { getLocalizedTaskContent } from "../i18n/taskSamples";
 
 export default function TaskItem({ task, onCompleted, showDelete = false }) {
+  const { t } = useTranslation();
+  const localizedTask = getLocalizedTaskContent(task, t);
   const [completing, setCompleting] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -81,7 +85,7 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
       onCompleted();
     } catch (err) {
       console.error("Error:", err);
-      alert("Failed to reschedule task");
+      alert(t("taskItem.failedReschedule"));
     } finally {
       setCompleting(false);
     }
@@ -96,7 +100,7 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
       onCompleted();
     } catch (err) {
       console.error("Error:", err);
-      alert("Failed to delete task");
+      alert(t("taskItem.failedDelete"));
     } finally {
       setCompleting(false);
     }
@@ -129,13 +133,13 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
           <div
             className={`task-title ${task.status === "completed" ? "completed" : ""}`}
           >
-            {task.title}
+            {localizedTask.title}
           </div>
           <div className="task-meta">
-            <span className="meta-category">{task.category}</span>
+            <span className="meta-category">{t(`categories.${task.category}`, { defaultValue: task.category })}</span>
             {task.estimated_minutes && (
               <span className="meta-duration">
-                · {task.estimated_minutes} min
+                · {task.estimated_minutes} {t("quickCapture.minutes")}
               </span>
             )}
           </div>
@@ -166,24 +170,24 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
               {task.status === "pending" && (
                 <>
                   <button className="menu-item" onClick={handleRescheduleClick}>
-                    📅 Reschedule
+                    📅 {t("taskItem.reschedule")}
                   </button>
                   <button className="menu-item" onClick={handleArchive}>
-                    🗑️ Archive
+                    🗑️ {t("taskItem.archive")}
                   </button>
                 </>
               )}
               {task.status === "completed" && (
                 <>
                   <button className="menu-item" onClick={handleRestore}>
-                    ↩️ Restore
+                    ↩️ {t("taskItem.restore")}
                   </button>
                   {showDelete && (
                     <button
                       className="menu-item delete-btn"
                       onClick={() => setShowConfirm(true)}
                     >
-                      ❌ Delete
+                      ❌ {t("taskItem.delete")}
                     </button>
                   )}
                 </>
@@ -191,14 +195,14 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
               {task.status === "archived" && (
                 <>
                   <button className="menu-item" onClick={handleRestore}>
-                    ↩️ Restore
+                    ↩️ {t("taskItem.restore")}
                   </button>
                   {showDelete && (
                     <button
                       className="menu-item delete-btn"
                       onClick={() => setShowConfirm(true)}
                     >
-                      ❌ Delete
+                      ❌ {t("taskItem.delete")}
                     </button>
                   )}
                 </>
@@ -224,21 +228,21 @@ export default function TaskItem({ task, onCompleted, showDelete = false }) {
               onClick={() => setShowConfirm(false)}
             />
             <div className="confirm-dialog">
-              <h3>Delete Task?</h3>
-              <p>This cannot be undone.</p>
+              <h3>{t("taskItem.deleteTaskTitle")}</h3>
+              <p>{t("taskItem.deleteTaskWarning")}</p>
               <div className="confirm-actions">
                 <button
                   className="btn btn-primary"
                   onClick={handleDelete}
                   disabled={completing}
                 >
-                  Delete
+                  {t("taskItem.delete")}
                 </button>
                 <button
                   className="btn btn-secondary"
                   onClick={() => setShowConfirm(false)}
                 >
-                  Cancel
+                  {t("header.cancel")}
                 </button>
               </div>
             </div>

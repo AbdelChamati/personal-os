@@ -1,0 +1,167 @@
+{
+  "app": {
+    "loading": "Chargement...",
+    "connectionErrorTitle": "Erreur de connexion",
+    "backendNotResponding": "Le backend ne repond pas",
+    "backendConnectFailed": "Connexion au backend echouee. Lancez: npm run dev"
+  },
+  "header": {
+    "appTitle": "PERSONAL REMINDER OS",
+    "addName": "+ Ajouter votre nom",
+    "yourName": "Votre nom",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "today": "Aujourd'hui",
+    "darkMode": "Mode sombre",
+    "lightMode": "Mode clair",
+    "toggleTheme": "Basculer le theme",
+    "language": "Langue",
+    "languageShort": "Lang"
+  },
+  "today": {
+    "filters": {
+      "today": "Aujourd'hui",
+      "all": "Toutes en attente",
+      "overdue": "En retard",
+      "completed": "Terminees",
+      "archived": "Archivees"
+    },
+    "next": "SUIVANTES",
+    "noPendingToday": "Aucune tache en attente aujourd'hui. Bravo!",
+    "noTasksForFilter": "Aucune tache pour {{filter}}",
+    "noMoreTasks": "Plus de taches",
+    "failedToLoad": "Impossible de charger les taches"
+  },
+  "backup": {
+    "export": "Exporter la sauvegarde",
+    "import": "Importer la sauvegarde",
+    "importing": "Import en cours...",
+    "jsonDescription": "Sauvegarde JSON",
+    "shareTitle": "Sauvegarde Personal Reminder OS",
+    "shareText": "Fichier de sauvegarde",
+    "copySuccess": "JSON de sauvegarde copie dans le presse-papiers.",
+    "exportDialogTitle": "Exporter la sauvegarde",
+    "exportDialogText": "Choisissez comment enregistrer le fichier de sauvegarde.",
+    "saveAs": "Enregistrer sous",
+    "share": "Partager",
+    "copyJson": "Copier JSON",
+    "working": "Traitement...",
+    "failedExport": "Echec de l'export de sauvegarde",
+    "failedShare": "Echec du partage de sauvegarde",
+    "failedImport": "Echec de l'import de sauvegarde. Utilisez un fichier JSON valide.",
+    "shareNotSupported": "Le partage n'est pas pris en charge sur ce navigateur. Utilisez Enregistrer sous ou Copier JSON.",
+    "copyNotSupported": "La copie dans le presse-papiers n'est pas prise en charge ici. Utilisez Enregistrer sous."
+  },
+  "quickCapture": {
+    "title": "SAISIE RAPIDE",
+    "placeholder": "Exemple: Appeler dentiste demain 9h priorite haute 20m",
+    "titleRequired": "Le titre est obligatoire",
+    "minutes": "Minutes",
+    "addTask": "+ Ajouter tache",
+    "adding": "Ajout en cours...",
+    "failedCreate": "Echec de creation de la tache",
+    "autoDetected": "Detecte automatiquement: {{details}}",
+    "dueDateTime": "date/heure d'echeance",
+    "hintPriority": "priorite {{value}}",
+    "hintMinutes": "{{value}} min"
+  },
+  "stats": {
+    "pending": "En attente",
+    "overdue": "En retard",
+    "completed": "Terminees",
+    "plannedMin": "Min planifiees"
+  },
+  "focus": {
+    "failedComplete": "Impossible de terminer la tache",
+    "failedUpdate": "Impossible de mettre a jour la tache",
+    "failedArchive": "Impossible d'archiver la tache",
+    "noDueTime": "Aucune echeance",
+    "dueTodayAt": "Due aujourd'hui a {{time}}",
+    "dueTomorrowAt": "Due demain a {{time}}",
+    "dueDateAt": "{{date}} a {{time}}",
+    "editTask": "MODIFIER LA TACHE",
+    "titleRequiredLabel": "Titre *",
+    "taskTitlePlaceholder": "Titre de la tache",
+    "description": "Description",
+    "taskDescriptionPlaceholder": "Description de la tache (optionnel)",
+    "category": "Categorie",
+    "priority": "Priorite",
+    "estMinutes": "Min estimees",
+    "dueDateTime": "Date et heure",
+    "saving": "Enregistrement...",
+    "doNow": "FAIRE MAINTENANT",
+    "moreOptions": "Plus d'options",
+    "archive": "Archiver",
+    "priorityBadge": "Priorite {{priority}}",
+    "whyThisTask": "Pourquoi cette tache?",
+    "completing": "Finalisation...",
+    "reasons": {
+      "highPriority": "Priorite haute",
+      "mediumPriority": "Priorite moyenne",
+      "overdueImmediate": "En retard - attention immediate requise",
+      "deadline30": "Echeance dans moins de 30 minutes",
+      "deadline2h": "Echeance dans les 2 prochaines heures",
+      "dueToday": "Echeance aujourd'hui",
+      "escalationLevel": "Niveau d'escalade {{level}}",
+      "pendingDays": "En attente depuis {{days}} jours",
+      "selectedForFocus": "Selectionnee pour le focus"
+    }
+  },
+  "taskItem": {
+    "reschedule": "Replanifier",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "delete": "Supprimer",
+    "deleteTaskTitle": "Supprimer la tache?",
+    "deleteTaskWarning": "Cette action est irreversible.",
+    "failedReschedule": "Impossible de replanifier la tache",
+    "failedDelete": "Impossible de supprimer la tache"
+  },
+  "reschedule": {
+    "title": "Replanifier la tache",
+    "dateTime": "Date et heure",
+    "confirm": "Replanifier",
+    "clearDueDate": "Effacer l'echeance"
+  },
+  "taskSamples": {
+    "studyUiPath": {
+      "title": "Apprendre UiPath",
+      "description": "Terminer le cours de base sur l'automatisation UiPath"
+    },
+    "buyGroceries": {
+      "title": "Faire les courses",
+      "description": "Lait, oeufs, pain et legumes"
+    },
+    "planTomorrow": {
+      "title": "Planifier demain",
+      "description": "Verifier le calendrier et planifier les taches quotidiennes"
+    },
+    "callDentist": {
+      "title": "Appeler le dentiste pour un rendez-vous",
+      "description": "Programmer le controle de routine"
+    },
+    "reviewBudget": {
+      "title": "Revoir le budget",
+      "description": "Verifier les depenses mensuelles et ajuster les categories"
+    }
+  },
+  "categories": {
+    "Personal": "Personnel",
+    "Professional": "Professionnel",
+    "Family": "Famille",
+    "Home": "Maison",
+    "Finance": "Finance",
+    "Shopping": "Achats",
+    "Health": "Sante",
+    "Other": "Autre"
+  },
+  "priorities": {
+    "low": "Basse",
+    "medium": "Moyenne",
+    "high": "Haute"
+  },
+  "mobile": {
+    "done": "Fait",
+    "add": "Ajouter"
+  }
+}

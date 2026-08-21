@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3001;
 
 // Middleware
 app.use(cors());
@@ -100,7 +100,7 @@ async function start() {
 
     // Start server
     app.listen(PORT, () => {
-      console.log(`Personal OS backend listening on http://localhost:${PORT}`);
+      console.log(`Personal Reminder OS backend listening on http://localhost:${PORT}`);
       console.log(`API available at http://localhost:${PORT}/api`);
       
       // Start escalation check every minute

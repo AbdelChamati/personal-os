@@ -1,0 +1,167 @@
+{
+  "app": {
+    "loading": "Caricamento...",
+    "connectionErrorTitle": "Errore di connessione",
+    "backendNotResponding": "Il backend non risponde",
+    "backendConnectFailed": "Connessione al backend non riuscita. Esegui: npm run dev"
+  },
+  "header": {
+    "appTitle": "PERSONAL REMINDER OS",
+    "addName": "+ Aggiungi nome",
+    "yourName": "Il tuo nome",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "today": "Oggi",
+    "darkMode": "Modalita scura",
+    "lightMode": "Modalita chiara",
+    "toggleTheme": "Cambia tema",
+    "language": "Lingua",
+    "languageShort": "Ling"
+  },
+  "today": {
+    "filters": {
+      "today": "Oggi",
+      "all": "Tutte in sospeso",
+      "overdue": "Scadute",
+      "completed": "Completate",
+      "archived": "Archiviate"
+    },
+    "next": "PROSSIME",
+    "noPendingToday": "Nessuna attivita in sospeso per oggi. Ottimo lavoro!",
+    "noTasksForFilter": "Nessuna attivita per {{filter}}",
+    "noMoreTasks": "Nessun'altra attivita",
+    "failedToLoad": "Impossibile caricare le attivita"
+  },
+  "backup": {
+    "export": "Esporta backup",
+    "import": "Importa backup",
+    "importing": "Importazione...",
+    "jsonDescription": "Backup JSON",
+    "shareTitle": "Backup Personal Reminder OS",
+    "shareText": "File di backup",
+    "copySuccess": "JSON di backup copiato negli appunti.",
+    "exportDialogTitle": "Esporta backup",
+    "exportDialogText": "Scegli come salvare il file di backup.",
+    "saveAs": "Salva con nome",
+    "share": "Condividi",
+    "copyJson": "Copia JSON",
+    "working": "Operazione in corso...",
+    "failedExport": "Esportazione backup non riuscita",
+    "failedShare": "Condivisione backup non riuscita",
+    "failedImport": "Importazione backup non riuscita. Usa un file JSON valido.",
+    "shareNotSupported": "La condivisione non e supportata in questo browser. Usa Salva con nome o Copia JSON.",
+    "copyNotSupported": "Copia negli appunti non supportata qui. Usa Salva con nome."
+  },
+  "quickCapture": {
+    "title": "CATTURA RAPIDA",
+    "placeholder": "Prova: Chiama dentista domani 9am alta 20m",
+    "titleRequired": "Il titolo e obbligatorio",
+    "minutes": "Minuti",
+    "addTask": "+ Aggiungi attivita",
+    "adding": "Aggiunta in corso...",
+    "failedCreate": "Creazione attivita non riuscita",
+    "autoDetected": "Rilevato automaticamente: {{details}}",
+    "dueDateTime": "data/ora di scadenza",
+    "hintPriority": "priorita {{value}}",
+    "hintMinutes": "{{value}} min"
+  },
+  "stats": {
+    "pending": "In sospeso",
+    "overdue": "Scadute",
+    "completed": "Completate",
+    "plannedMin": "Min pianificati"
+  },
+  "focus": {
+    "failedComplete": "Impossibile completare l'attivita",
+    "failedUpdate": "Impossibile aggiornare l'attivita",
+    "failedArchive": "Impossibile archiviare l'attivita",
+    "noDueTime": "Nessuna scadenza",
+    "dueTodayAt": "Scade oggi alle {{time}}",
+    "dueTomorrowAt": "Scade domani alle {{time}}",
+    "dueDateAt": "{{date}} alle {{time}}",
+    "editTask": "MODIFICA ATTIVITA",
+    "titleRequiredLabel": "Titolo *",
+    "taskTitlePlaceholder": "Titolo attivita",
+    "description": "Descrizione",
+    "taskDescriptionPlaceholder": "Descrizione attivita (opzionale)",
+    "category": "Categoria",
+    "priority": "Priorita",
+    "estMinutes": "Min stimati",
+    "dueDateTime": "Data e ora",
+    "saving": "Salvataggio...",
+    "doNow": "FAI ORA",
+    "moreOptions": "Altre opzioni",
+    "archive": "Archivia",
+    "priorityBadge": "Priorita {{priority}}",
+    "whyThisTask": "Perche questa attivita?",
+    "completing": "Completamento...",
+    "reasons": {
+      "highPriority": "Priorita alta",
+      "mediumPriority": "Priorita media",
+      "overdueImmediate": "Scaduta - richiede attenzione immediata",
+      "deadline30": "Scadenza tra meno di 30 minuti",
+      "deadline2h": "Scadenza entro le prossime 2 ore",
+      "dueToday": "Scade oggi",
+      "escalationLevel": "Livello escalation {{level}}",
+      "pendingDays": "In sospeso da {{days}} giorni",
+      "selectedForFocus": "Selezionata come focus"
+    }
+  },
+  "taskItem": {
+    "reschedule": "Riprogramma",
+    "archive": "Archivia",
+    "restore": "Ripristina",
+    "delete": "Elimina",
+    "deleteTaskTitle": "Eliminare attivita?",
+    "deleteTaskWarning": "Questa azione non puo essere annullata.",
+    "failedReschedule": "Impossibile riprogrammare l'attivita",
+    "failedDelete": "Impossibile eliminare l'attivita"
+  },
+  "reschedule": {
+    "title": "Riprogramma attivita",
+    "dateTime": "Data e ora",
+    "confirm": "Riprogramma",
+    "clearDueDate": "Rimuovi data di scadenza"
+  },
+  "taskSamples": {
+    "studyUiPath": {
+      "title": "Studia UiPath",
+      "description": "Completa il corso di base sull'automazione UiPath"
+    },
+    "buyGroceries": {
+      "title": "Compra generi alimentari",
+      "description": "Latte, uova, pane e verdure"
+    },
+    "planTomorrow": {
+      "title": "Pianifica domani",
+      "description": "Controlla il calendario e pianifica le attivita giornaliere"
+    },
+    "callDentist": {
+      "title": "Chiama il dentista per un appuntamento",
+      "description": "Programma il controllo di routine"
+    },
+    "reviewBudget": {
+      "title": "Rivedi il budget",
+      "description": "Controlla le spese mensili e adatta le categorie"
+    }
+  },
+  "categories": {
+    "Personal": "Personale",
+    "Professional": "Professionale",
+    "Family": "Famiglia",
+    "Home": "Casa",
+    "Finance": "Finanze",
+    "Shopping": "Acquisti",
+    "Health": "Salute",
+    "Other": "Altro"
+  },
+  "priorities": {
+    "low": "Bassa",
+    "medium": "Media",
+    "high": "Alta"
+  },
+  "mobile": {
+    "done": "Fatto",
+    "add": "Aggiungi"
+  }
+}

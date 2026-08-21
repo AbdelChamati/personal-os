@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Today from './views/Today';
-import { getStats } from './api/api';
 
 export default function App() {
+  const { t } = useTranslation();
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState(null);
 
@@ -14,20 +15,20 @@ export default function App() {
         if (response.ok) {
           setIsReady(true);
         } else {
-          setError('Backend not responding');
+          setError(t('app.backendNotResponding'));
         }
       } catch (err) {
-        setError('Failed to connect to backend. Make sure to run: npm run dev');
+        setError(t('app.backendConnectFailed'));
       }
     };
 
     checkHealth();
-  }, []);
+  }, [t]);
 
   if (error) {
     return (
-      <div style={{ padding: '20px', color: '#ff6b6b', textAlign: 'center' }}>
-        <h1>Connection Error</h1>
+      <div className="status-screen status-error">
+        <h1>{t('app.connectionErrorTitle')}</h1>
         <p>{error}</p>
       </div>
     );
@@ -35,8 +36,8 @@ export default function App() {
 
   if (!isReady) {
     return (
-      <div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>
-        <h1>Loading...</h1>
+      <div className="status-screen status-loading">
+        <h1>{t('app.loading')}</h1>
       </div>
     );
   }

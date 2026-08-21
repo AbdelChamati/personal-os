@@ -6,6 +6,10 @@ import { createNextOccurrence } from '../services/recurrence.js';
 
 const router = express.Router();
 
+const VALID_PRIORITIES = new Set(['low', 'medium', 'high']);
+const VALID_STATUSES = new Set(['pending', 'completed', 'archived']);
+const VALID_CATEGORIES = new Set(['Personal', 'Professional', 'Family', 'Home', 'Finance', 'Shopping', 'Health', 'Other']);
+
 // GET all tasks
 router.get('/', (req, res) => {
   try {
@@ -15,6 +19,129 @@ router.get('/', (req, res) => {
   } catch (error) {
     console.error('Error fetching tasks:', error);
     res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+});
+
+// GET export tasks backup
+router.get('/export', (req, res) => {
+  try {
+    const db = getDatabase();
+    const tasks = db.prepare('SELECT * FROM tasks ORDER BY created_at DESC').all();
+    res.json({
+      version: 1,
+      exported_at: new Date().toISOString(),
+      count: tasks.length,
+      tasks,
+    });
+  } catch (error) {
+    console.error('Error exporting tasks:', error);
+    res.status(500).json({ error: 'Failed to export tasks' });
+  }
+});
+
+// POST import tasks backup
+router.post('/import', (req, res) => {
+  try {
+    const db = getDatabase();
+    const { tasks, mode = 'merge' } = req.body || {};
+
+    if (!Array.isArray(tasks)) {
+      return res.status(400).json({ error: 'tasks array is required' });
+    }
+
+    if (!['merge', 'replace'].includes(mode)) {
+      return res.status(400).json({ error: 'mode must be merge or replace' });
+    }
+
+    if (mode === 'replace') {
+      db.prepare('DELETE FROM tasks').run();
+    }
+
+    let imported = 0;
+    let updated = 0;
+
+    tasks.forEach((inputTask) => {
+      if (!inputTask || typeof inputTask !== 'object' || !inputTask.title) {
+        return;
+      }
+
+      const id = inputTask.id || uuidv4();
+      const existing = db.prepare('SELECT id FROM tasks WHERE id = ?').get(id);
+
+      const normalized = {
+        id,
+        title: String(inputTask.title).trim(),
+        description: inputTask.description || null,
+        category: VALID_CATEGORIES.has(inputTask.category) ? inputTask.category : 'Other',
+        priority: VALID_PRIORITIES.has(inputTask.priority) ? inputTask.priority : 'medium',
+        status: VALID_STATUSES.has(inputTask.status) ? inputTask.status : 'pending',
+        estimated_minutes: Number.isInteger(inputTask.estimated_minutes) ? inputTask.estimated_minutes : null,
+        due_at: inputTask.due_at || null,
+        expires_at: inputTask.expires_at || null,
+        recurrence_rule: inputTask.recurrence_rule || null,
+        created_at: inputTask.created_at || new Date().toISOString(),
+        completed_at: inputTask.completed_at || null,
+        escalation_level: Number.isInteger(inputTask.escalation_level) ? inputTask.escalation_level : 0,
+      };
+
+      if (!normalized.title) {
+        return;
+      }
+
+      if (existing) {
+        db.prepare(`
+          UPDATE tasks
+          SET title = ?, description = ?, category = ?, priority = ?, status = ?, estimated_minutes = ?, due_at = ?, expires_at = ?, recurrence_rule = ?, created_at = ?, completed_at = ?, escalation_level = ?
+          WHERE id = ?
+        `).run(
+          normalized.title,
+          normalized.description,
+          normalized.category,
+          normalized.priority,
+          normalized.status,
+          normalized.estimated_minutes,
+          normalized.due_at,
+          normalized.expires_at,
+          normalized.recurrence_rule,
+          normalized.created_at,
+          normalized.completed_at,
+          normalized.escalation_level,
+          normalized.id
+        );
+        updated += 1;
+      } else {
+        db.prepare(`
+          INSERT INTO tasks (id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          normalized.id,
+          normalized.title,
+          normalized.description,
+          normalized.category,
+          normalized.priority,
+          normalized.status,
+          normalized.estimated_minutes,
+          normalized.due_at,
+          normalized.expires_at,
+          normalized.recurrence_rule,
+          normalized.created_at,
+          normalized.completed_at,
+          normalized.escalation_level
+        );
+        imported += 1;
+      }
+    });
+
+    res.json({
+      ok: true,
+      mode,
+      imported,
+      updated,
+      total: imported + updated,
+    });
+  } catch (error) {
+    console.error('Error importing tasks:', error);
+    res.status(500).json({ error: 'Failed to import tasks' });
   }
 });
 
@@ -45,11 +172,11 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: 'Title is required' });
     }
     
-    if (priority && !['low', 'medium', 'high'].includes(priority)) {
+    if (priority && !VALID_PRIORITIES.has(priority)) {
       return res.status(400).json({ error: 'Invalid priority' });
     }
     
-    if (category && !['Personal', 'Professional', 'Family', 'Home', 'Finance', 'Shopping', 'Health', 'Other'].includes(category)) {
+    if (category && !VALID_CATEGORIES.has(category)) {
       return res.status(400).json({ error: 'Invalid category' });
     }
     
@@ -97,15 +224,15 @@ router.patch('/:id', (req, res) => {
     const { title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, escalation_level } = req.body;
     
     // Validation
-    if (priority && !['low', 'medium', 'high'].includes(priority)) {
+    if (priority && !VALID_PRIORITIES.has(priority)) {
       return res.status(400).json({ error: 'Invalid priority' });
     }
     
-    if (status && !['pending', 'completed', 'archived'].includes(status)) {
+    if (status && !VALID_STATUSES.has(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
     
-    if (category && !['Personal', 'Professional', 'Family', 'Home', 'Finance', 'Shopping', 'Health', 'Other'].includes(category)) {
+    if (category && !VALID_CATEGORIES.has(category)) {
       return res.status(400).json({ error: 'Invalid category' });
     }
     

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
+import { useTranslation } from "react-i18next";
 
 export default function RescheduleModal({ task, onConfirm, onCancel }) {
+  const { t } = useTranslation();
   const [dateTime, setDateTime] = useState(task.due_at || "");
 
   const handleSubmit = (e) => {
@@ -17,12 +19,12 @@ export default function RescheduleModal({ task, onConfirm, onCancel }) {
     <>
       <div className="confirm-overlay" onClick={onCancel} />
       <div className="confirm-dialog reschedule-modal">
-        <h3>Reschedule Task</h3>
+        <h3>{t("reschedule.title")}</h3>
         <p className="modal-subtitle">{task.title}</p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Date & Time</label>
+            <label className="form-label">{t("reschedule.dateTime")}</label>
             <input
               type="datetime-local"
               className="form-input"
@@ -38,21 +40,21 @@ export default function RescheduleModal({ task, onConfirm, onCancel }) {
               className="btn btn-primary"
               disabled={!dateTime}
             >
-              Reschedule
+              {t("reschedule.confirm")}
             </button>
             <button
               type="button"
               className="btn btn-secondary"
               onClick={handleClear}
             >
-              Clear Due Date
+              {t("reschedule.clearDueDate")}
             </button>
             <button
               type="button"
               className="btn btn-secondary"
               onClick={onCancel}
             >
-              Cancel
+              {t("header.cancel")}
             </button>
           </div>
         </form>

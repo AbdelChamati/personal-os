@@ -1,0 +1,167 @@
+{
+  "app": {
+    "loading": "Cargando...",
+    "connectionErrorTitle": "Error de conexion",
+    "backendNotResponding": "El backend no responde",
+    "backendConnectFailed": "No se pudo conectar con el backend. Ejecuta: npm run dev"
+  },
+  "header": {
+    "appTitle": "PERSONAL REMINDER OS",
+    "addName": "+ Agregar tu nombre",
+    "yourName": "Tu nombre",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "today": "Hoy",
+    "darkMode": "Modo oscuro",
+    "lightMode": "Modo claro",
+    "toggleTheme": "Cambiar tema",
+    "language": "Idioma",
+    "languageShort": "Idi"
+  },
+  "today": {
+    "filters": {
+      "today": "Hoy",
+      "all": "Todas pendientes",
+      "overdue": "Atrasadas",
+      "completed": "Completadas",
+      "archived": "Archivadas"
+    },
+    "next": "SIGUIENTES",
+    "noPendingToday": "No hay tareas pendientes para hoy. Buen trabajo!",
+    "noTasksForFilter": "No hay tareas para {{filter}}",
+    "noMoreTasks": "No hay mas tareas",
+    "failedToLoad": "No se pudieron cargar las tareas"
+  },
+  "backup": {
+    "export": "Exportar copia",
+    "import": "Importar copia",
+    "importing": "Importando...",
+    "jsonDescription": "Copia JSON",
+    "shareTitle": "Copia de Personal Reminder OS",
+    "shareText": "Archivo de copia",
+    "copySuccess": "JSON de copia copiado al portapapeles.",
+    "exportDialogTitle": "Exportar copia",
+    "exportDialogText": "Elige como quieres guardar el archivo de copia.",
+    "saveAs": "Guardar como",
+    "share": "Compartir",
+    "copyJson": "Copiar JSON",
+    "working": "Procesando...",
+    "failedExport": "No se pudo exportar la copia",
+    "failedShare": "No se pudo compartir la copia",
+    "failedImport": "No se pudo importar la copia. Usa un archivo JSON valido.",
+    "shareNotSupported": "Compartir no es compatible en este navegador. Usa Guardar como o Copiar JSON.",
+    "copyNotSupported": "Copiar al portapapeles no es compatible aqui. Usa Guardar como."
+  },
+  "quickCapture": {
+    "title": "CAPTURA RAPIDA",
+    "placeholder": "Prueba: Llamar dentista manana 9am alta 20m",
+    "titleRequired": "El titulo es obligatorio",
+    "minutes": "Minutos",
+    "addTask": "+ Agregar tarea",
+    "adding": "Agregando...",
+    "failedCreate": "No se pudo crear la tarea",
+    "autoDetected": "Detectado automaticamente: {{details}}",
+    "dueDateTime": "fecha/hora limite",
+    "hintPriority": "prioridad {{value}}",
+    "hintMinutes": "{{value}} min"
+  },
+  "stats": {
+    "pending": "Pendientes",
+    "overdue": "Atrasadas",
+    "completed": "Completadas",
+    "plannedMin": "Min planificados"
+  },
+  "focus": {
+    "failedComplete": "No se pudo completar la tarea",
+    "failedUpdate": "No se pudo actualizar la tarea",
+    "failedArchive": "No se pudo archivar la tarea",
+    "noDueTime": "Sin fecha limite",
+    "dueTodayAt": "Vence hoy a las {{time}}",
+    "dueTomorrowAt": "Vence manana a las {{time}}",
+    "dueDateAt": "{{date}} a las {{time}}",
+    "editTask": "EDITAR TAREA",
+    "titleRequiredLabel": "Titulo *",
+    "taskTitlePlaceholder": "Titulo de la tarea",
+    "description": "Descripcion",
+    "taskDescriptionPlaceholder": "Descripcion de la tarea (opcional)",
+    "category": "Categoria",
+    "priority": "Prioridad",
+    "estMinutes": "Min estimados",
+    "dueDateTime": "Fecha y hora",
+    "saving": "Guardando...",
+    "doNow": "HACER AHORA",
+    "moreOptions": "Mas opciones",
+    "archive": "Archivar",
+    "priorityBadge": "Prioridad {{priority}}",
+    "whyThisTask": "Por que esta tarea?",
+    "completing": "Completando...",
+    "reasons": {
+      "highPriority": "Prioridad alta",
+      "mediumPriority": "Prioridad media",
+      "overdueImmediate": "Atrasada - necesita atencion inmediata",
+      "deadline30": "Fecha limite en menos de 30 minutos",
+      "deadline2h": "Fecha limite dentro de las proximas 2 horas",
+      "dueToday": "Vence hoy",
+      "escalationLevel": "Nivel de escalado {{level}}",
+      "pendingDays": "Pendiente desde hace {{days}} dias",
+      "selectedForFocus": "Seleccionada para enfoque"
+    }
+  },
+  "taskItem": {
+    "reschedule": "Reprogramar",
+    "archive": "Archivar",
+    "restore": "Restaurar",
+    "delete": "Eliminar",
+    "deleteTaskTitle": "Eliminar tarea?",
+    "deleteTaskWarning": "Esto no se puede deshacer.",
+    "failedReschedule": "No se pudo reprogramar la tarea",
+    "failedDelete": "No se pudo eliminar la tarea"
+  },
+  "reschedule": {
+    "title": "Reprogramar tarea",
+    "dateTime": "Fecha y hora",
+    "confirm": "Reprogramar",
+    "clearDueDate": "Quitar fecha limite"
+  },
+  "taskSamples": {
+    "studyUiPath": {
+      "title": "Estudia UiPath",
+      "description": "Completa el curso basico de automatizacion de UiPath"
+    },
+    "buyGroceries": {
+      "title": "Comprar comestibles",
+      "description": "Leche, huevos, pan y verduras"
+    },
+    "planTomorrow": {
+      "title": "Planifica manana",
+      "description": "Revisa el calendario y planifica las tareas diarias"
+    },
+    "callDentist": {
+      "title": "Llamar al dentista para una cita",
+      "description": "Programar la revision rutinaria"
+    },
+    "reviewBudget": {
+      "title": "Revisar presupuesto",
+      "description": "Comprueba los gastos mensuales y ajusta las categorias"
+    }
+  },
+  "categories": {
+    "Personal": "Personal",
+    "Professional": "Profesional",
+    "Family": "Familia",
+    "Home": "Hogar",
+    "Finance": "Finanzas",
+    "Shopping": "Compras",
+    "Health": "Salud",
+    "Other": "Otro"
+  },
+  "priorities": {
+    "low": "Baja",
+    "medium": "Media",
+    "high": "Alta"
+  },
+  "mobile": {
+    "done": "Hecho",
+    "add": "Agregar"
+  }
+}

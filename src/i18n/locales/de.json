@@ -1,0 +1,167 @@
+{
+  "app": {
+    "loading": "Wird geladen...",
+    "connectionErrorTitle": "Verbindungsfehler",
+    "backendNotResponding": "Backend antwortet nicht",
+    "backendConnectFailed": "Verbindung zum Backend fehlgeschlagen. Bitte ausfuhren: npm run dev"
+  },
+  "header": {
+    "appTitle": "PERSONAL REMINDER OS",
+    "addName": "+ Namen hinzufugen",
+    "yourName": "Ihr Name",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "today": "Heute",
+    "darkMode": "Dunkelmodus",
+    "lightMode": "Hellmodus",
+    "toggleTheme": "Design wechseln",
+    "language": "Sprache",
+    "languageShort": "Spr"
+  },
+  "today": {
+    "filters": {
+      "today": "Heute",
+      "all": "Alle Offen",
+      "overdue": "Uberfallig",
+      "completed": "Erledigt",
+      "archived": "Archiviert"
+    },
+    "next": "ALS NACHSTES",
+    "noPendingToday": "Keine offenen Aufgaben fur heute. Stark!",
+    "noTasksForFilter": "Keine Aufgaben fur {{filter}}",
+    "noMoreTasks": "Keine weiteren Aufgaben",
+    "failedToLoad": "Aufgaben konnten nicht geladen werden"
+  },
+  "backup": {
+    "export": "Backup exportieren",
+    "import": "Backup importieren",
+    "importing": "Importiere...",
+    "jsonDescription": "JSON-Backup",
+    "shareTitle": "Personal Reminder OS Backup",
+    "shareText": "Backup-Datei",
+    "copySuccess": "Backup-JSON wurde in die Zwischenablage kopiert.",
+    "exportDialogTitle": "Backup exportieren",
+    "exportDialogText": "Wahlen Sie, wie Sie die Backup-Datei speichern mochten.",
+    "saveAs": "Speichern unter",
+    "share": "Teilen",
+    "copyJson": "JSON kopieren",
+    "working": "Wird verarbeitet...",
+    "failedExport": "Backup konnte nicht exportiert werden",
+    "failedShare": "Backup konnte nicht geteilt werden",
+    "failedImport": "Backup konnte nicht importiert werden. Bitte gultige JSON-Datei verwenden.",
+    "shareNotSupported": "Teilen wird in diesem Browser nicht unterstutzt. Nutzen Sie Speichern unter oder JSON kopieren.",
+    "copyNotSupported": "Kopieren in die Zwischenablage wird hier nicht unterstutzt. Nutzen Sie Speichern unter."
+  },
+  "quickCapture": {
+    "title": "SCHNELLE ERFASSUNG",
+    "placeholder": "Beispiel: Zahnarzt morgen 9 Uhr hoch 20m",
+    "titleRequired": "Titel ist erforderlich",
+    "minutes": "Minuten",
+    "addTask": "+ Aufgabe hinzufugen",
+    "adding": "Wird hinzugefugt...",
+    "failedCreate": "Aufgabe konnte nicht erstellt werden",
+    "autoDetected": "Automatisch erkannt: {{details}}",
+    "dueDateTime": "Falligkeit Datum/Uhrzeit",
+    "hintPriority": "Prioritat {{value}}",
+    "hintMinutes": "{{value}} Min"
+  },
+  "stats": {
+    "pending": "Offen",
+    "overdue": "Uberfallig",
+    "completed": "Erledigt",
+    "plannedMin": "Geplante Min"
+  },
+  "focus": {
+    "failedComplete": "Aufgabe konnte nicht abgeschlossen werden",
+    "failedUpdate": "Aufgabe konnte nicht aktualisiert werden",
+    "failedArchive": "Aufgabe konnte nicht archiviert werden",
+    "noDueTime": "Keine Falligkeit",
+    "dueTodayAt": "Heute fallig um {{time}}",
+    "dueTomorrowAt": "Morgen fallig um {{time}}",
+    "dueDateAt": "{{date}} um {{time}}",
+    "editTask": "AUFGABE BEARBEITEN",
+    "titleRequiredLabel": "Titel *",
+    "taskTitlePlaceholder": "Aufgabentitel",
+    "description": "Beschreibung",
+    "taskDescriptionPlaceholder": "Aufgabenbeschreibung (optional)",
+    "category": "Kategorie",
+    "priority": "Prioritat",
+    "estMinutes": "Gesch. Minuten",
+    "dueDateTime": "Datum & Uhrzeit",
+    "saving": "Speichere...",
+    "doNow": "JETZT ERLEDIGEN",
+    "moreOptions": "Weitere Optionen",
+    "archive": "Archivieren",
+    "priorityBadge": "Prioritat {{priority}}",
+    "whyThisTask": "Warum diese Aufgabe?",
+    "completing": "Wird abgeschlossen...",
+    "reasons": {
+      "highPriority": "Hohe Prioritat",
+      "mediumPriority": "Mittlere Prioritat",
+      "overdueImmediate": "Uberfallig - sofortige Aufmerksamkeit notig",
+      "deadline30": "Frist in weniger als 30 Minuten",
+      "deadline2h": "Frist innerhalb der nachsten 2 Stunden",
+      "dueToday": "Heute fallig",
+      "escalationLevel": "Eskalationsstufe {{level}}",
+      "pendingDays": "Seit {{days}} Tagen offen",
+      "selectedForFocus": "Als Fokus ausgewahlt"
+    }
+  },
+  "taskItem": {
+    "reschedule": "Neu planen",
+    "archive": "Archivieren",
+    "restore": "Wiederherstellen",
+    "delete": "Loschen",
+    "deleteTaskTitle": "Aufgabe loschen?",
+    "deleteTaskWarning": "Dies kann nicht ruckgangig gemacht werden.",
+    "failedReschedule": "Aufgabe konnte nicht neu geplant werden",
+    "failedDelete": "Aufgabe konnte nicht geloscht werden"
+  },
+  "reschedule": {
+    "title": "Aufgabe neu planen",
+    "dateTime": "Datum & Uhrzeit",
+    "confirm": "Neu planen",
+    "clearDueDate": "Falligkeit entfernen"
+  },
+  "taskSamples": {
+    "studyUiPath": {
+      "title": "UiPath lernen",
+      "description": "UiPath-Grundlagenkurs zur Automatisierung abschliessen"
+    },
+    "buyGroceries": {
+      "title": "Einkaufen gehen",
+      "description": "Milch, Eier, Brot und Gemuse"
+    },
+    "planTomorrow": {
+      "title": "Morgen planen",
+      "description": "Kalender uberprufen und tagliche Aufgaben planen"
+    },
+    "callDentist": {
+      "title": "Zahnarzttermin vereinbaren",
+      "description": "Regelmassige Vorsorgeuntersuchung planen"
+    },
+    "reviewBudget": {
+      "title": "Budget uberprufen",
+      "description": "Monatliche Ausgaben prufen und Kategorien anpassen"
+    }
+  },
+  "categories": {
+    "Personal": "Personlich",
+    "Professional": "Beruflich",
+    "Family": "Familie",
+    "Home": "Haushalt",
+    "Finance": "Finanzen",
+    "Shopping": "Einkaufen",
+    "Health": "Gesundheit",
+    "Other": "Sonstiges"
+  },
+  "priorities": {
+    "low": "Niedrig",
+    "medium": "Mittel",
+    "high": "Hoch"
+  },
+  "mobile": {
+    "done": "Fertig",
+    "add": "Neu"
+  }
+}

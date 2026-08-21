@@ -1,0 +1,167 @@
+{
+  "app": {
+    "loading": "Loading...",
+    "connectionErrorTitle": "Connection Error",
+    "backendNotResponding": "Backend not responding",
+    "backendConnectFailed": "Failed to connect to backend. Make sure to run: npm run dev"
+  },
+  "header": {
+    "appTitle": "PERSONAL REMINDER OS",
+    "addName": "+ Add your name",
+    "yourName": "Your name",
+    "save": "Save",
+    "cancel": "Cancel",
+    "today": "Today",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "toggleTheme": "Toggle theme",
+    "language": "Language",
+    "languageShort": "Lang"
+  },
+  "today": {
+    "filters": {
+      "today": "Today",
+      "all": "All Pending",
+      "overdue": "Overdue",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "next": "NEXT",
+    "noPendingToday": "No pending tasks for today. Great work!",
+    "noTasksForFilter": "No {{filter}} tasks",
+    "noMoreTasks": "No more tasks",
+    "failedToLoad": "Failed to load tasks"
+  },
+  "backup": {
+    "export": "Export Backup",
+    "import": "Import Backup",
+    "importing": "Importing...",
+    "jsonDescription": "JSON backup",
+    "shareTitle": "Personal Reminder OS backup",
+    "shareText": "Backup file",
+    "copySuccess": "Backup JSON copied to clipboard.",
+    "exportDialogTitle": "Export Backup",
+    "exportDialogText": "Choose how you want to save your backup file.",
+    "saveAs": "Save As",
+    "share": "Share",
+    "copyJson": "Copy JSON",
+    "working": "Working...",
+    "failedExport": "Failed to export backup",
+    "failedShare": "Failed to share backup",
+    "failedImport": "Failed to import backup. Use a valid JSON backup file.",
+    "shareNotSupported": "Share is not supported on this browser. Use Save As or Copy JSON.",
+    "copyNotSupported": "Copy to clipboard is not supported here. Use Save As."
+  },
+  "quickCapture": {
+    "title": "QUICK CAPTURE",
+    "placeholder": "Try: Call dentist tomorrow 9am high 20m",
+    "titleRequired": "Title is required",
+    "minutes": "Minutes",
+    "addTask": "+ Add Task",
+    "adding": "Adding...",
+    "failedCreate": "Failed to create task",
+    "autoDetected": "Auto-detected: {{details}}",
+    "dueDateTime": "due date/time",
+    "hintPriority": "priority {{value}}",
+    "hintMinutes": "{{value}} min"
+  },
+  "stats": {
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "completed": "Completed",
+    "plannedMin": "Planned min"
+  },
+  "focus": {
+    "failedComplete": "Failed to complete task",
+    "failedUpdate": "Failed to update task",
+    "failedArchive": "Failed to archive task",
+    "noDueTime": "No due time",
+    "dueTodayAt": "Due today at {{time}}",
+    "dueTomorrowAt": "Due tomorrow at {{time}}",
+    "dueDateAt": "{{date}} at {{time}}",
+    "editTask": "EDIT TASK",
+    "titleRequiredLabel": "Title *",
+    "taskTitlePlaceholder": "Task title",
+    "description": "Description",
+    "taskDescriptionPlaceholder": "Task description (optional)",
+    "category": "Category",
+    "priority": "Priority",
+    "estMinutes": "Est. Minutes",
+    "dueDateTime": "Due Date & Time",
+    "saving": "Saving...",
+    "doNow": "DO NOW",
+    "moreOptions": "More options",
+    "archive": "Archive",
+    "priorityBadge": "{{priority}} Priority",
+    "whyThisTask": "Why this task?",
+    "completing": "Completing...",
+    "reasons": {
+      "highPriority": "High priority",
+      "mediumPriority": "Medium priority",
+      "overdueImmediate": "Overdue - needs immediate attention",
+      "deadline30": "Deadline approaching in less than 30 minutes",
+      "deadline2h": "Deadline within next 2 hours",
+      "dueToday": "Due today",
+      "escalationLevel": "Escalation level {{level}}",
+      "pendingDays": "Pending for {{days}} days",
+      "selectedForFocus": "Selected for focus"
+    }
+  },
+  "taskItem": {
+    "reschedule": "Reschedule",
+    "archive": "Archive",
+    "restore": "Restore",
+    "delete": "Delete",
+    "deleteTaskTitle": "Delete Task?",
+    "deleteTaskWarning": "This cannot be undone.",
+    "failedReschedule": "Failed to reschedule task",
+    "failedDelete": "Failed to delete task"
+  },
+  "reschedule": {
+    "title": "Reschedule Task",
+    "dateTime": "Date & Time",
+    "confirm": "Reschedule",
+    "clearDueDate": "Clear Due Date"
+  },
+  "taskSamples": {
+    "studyUiPath": {
+      "title": "Study UiPath",
+      "description": "Complete UiPath automation fundamentals course"
+    },
+    "buyGroceries": {
+      "title": "Buy groceries",
+      "description": "Milk, eggs, bread, and vegetables"
+    },
+    "planTomorrow": {
+      "title": "Plan tomorrow",
+      "description": "Review calendar and plan daily tasks"
+    },
+    "callDentist": {
+      "title": "Call dentist for appointment",
+      "description": "Schedule routine checkup"
+    },
+    "reviewBudget": {
+      "title": "Review budget",
+      "description": "Check monthly spending and adjust categories"
+    }
+  },
+  "categories": {
+    "Personal": "Personal",
+    "Professional": "Professional",
+    "Family": "Family",
+    "Home": "Home",
+    "Finance": "Finance",
+    "Shopping": "Shopping",
+    "Health": "Health",
+    "Other": "Other"
+  },
+  "priorities": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "mobile": {
+    "done": "Done",
+    "add": "Add"
+  }
+}

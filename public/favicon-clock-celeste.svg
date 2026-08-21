@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Clock icon">
+  <defs>
+    <linearGradient id="celeste" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d7f2ff"/>
+      <stop offset="100%" stop-color="#8cdaf8"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#celeste)"/>
+  <circle cx="32" cy="32" r="18" fill="#f7fcff" stroke="#1a83d8" stroke-width="3"/>
+  <circle cx="32" cy="32" r="2.4" fill="#1a83d8"/>
+  <path d="M32 32V21" stroke="#1a83d8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M32 32L40 38" stroke="#1a83d8" stroke-width="3" stroke-linecap="round"/>
+</svg>
