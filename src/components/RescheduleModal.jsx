@@ -24,8 +24,12 @@ export default function RescheduleModal({ task, onConfirm, onCancel }) {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">{t("reschedule.dateTime")}</label>
+            <label className="form-label" htmlFor="reschedule-date-time">
+              {t("reschedule.dateTime")}
+            </label>
             <input
+              id="reschedule-date-time"
+              name="due_at"
               type="datetime-local"
               className="form-input"
               value={dateTime}
