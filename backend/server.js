@@ -2,10 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import 'dotenv/config';
 import { initializeDatabase, getDatabase } from './database.js';
+import authRouter from './routes/auth.js';
 import tasksRouter from './routes/tasks.js';
 import remindersRouter from './routes/reminders.js';
 import automationsRouter from './routes/automations.js';
+import { authMiddleware } from './middleware/auth.js';
 import { runEscalationCheck } from './services/escalation.js';
 import { calculateTaskScore } from './services/taskScoring.js';
 
@@ -24,21 +27,29 @@ async function start() {
   try {
     await initializeDatabase();
     
-    // Routes
-    app.use('/api/tasks', tasksRouter);
-    app.use('/api/reminders', remindersRouter);
-    app.use('/api/automations', automationsRouter);
+    // Public routes
+    app.use('/api/auth', authRouter);
 
-    // Today endpoint
-    app.get('/api/today', (req, res) => {
+    // Health check (public)
+    app.get('/api/health', (req, res) => {
+      res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    });
+
+    // Protected routes
+    app.use('/api/tasks', authMiddleware, tasksRouter);
+    app.use('/api/reminders', authMiddleware, remindersRouter);
+    app.use('/api/automations', authMiddleware, automationsRouter);
+
+    // Today endpoint (protected)
+    app.get('/api/today', authMiddleware, (req, res) => {
       try {
         const db = getDatabase();
         
         const tasks = db.prepare(`
           SELECT * FROM tasks
-          WHERE status = 'pending'
+          WHERE user_id = ? AND status = 'pending'
           ORDER BY created_at DESC
-        `).all();
+        `).all(req.user.id);
         
         const tasksWithScores = tasks.map(task => ({
           ...task,
@@ -52,11 +63,11 @@ async function start() {
         
         const stats = db.prepare(`
           SELECT
-            (SELECT COUNT(*) FROM tasks WHERE status = 'pending') as pending,
-            (SELECT COUNT(*) FROM tasks WHERE status = 'completed') as completed,
-            (SELECT COUNT(*) FROM tasks WHERE status = 'pending' AND due_at < datetime('now')) as overdue,
-            (SELECT COALESCE(SUM(estimated_minutes), 0) FROM tasks WHERE status = 'pending') as planned_minutes
-        `).get();
+            (SELECT COUNT(*) FROM tasks WHERE user_id = ? AND status = 'pending') as pending,
+            (SELECT COUNT(*) FROM tasks WHERE user_id = ? AND status = 'completed') as completed,
+            (SELECT COUNT(*) FROM tasks WHERE user_id = ? AND status = 'pending' AND due_at < datetime('now')) as overdue,
+            (SELECT COALESCE(SUM(estimated_minutes), 0) FROM tasks WHERE user_id = ? AND status = 'pending') as planned_minutes
+        `).get(req.user.id, req.user.id, req.user.id, req.user.id);
         
         res.json({ focus, next, stats });
       } catch (error) {
@@ -65,29 +76,24 @@ async function start() {
       }
     });
 
-    // Stats endpoint
-    app.get('/api/stats', (req, res) => {
+    // Stats endpoint (protected)
+    app.get('/api/stats', authMiddleware, (req, res) => {
       try {
         const db = getDatabase();
         
         const stats = db.prepare(`
           SELECT
-            (SELECT COUNT(*) FROM tasks WHERE status = 'pending') as pending,
-            (SELECT COUNT(*) FROM tasks WHERE status = 'completed') as completed,
-            (SELECT COUNT(*) FROM tasks WHERE status = 'pending' AND due_at < datetime('now')) as overdue,
-            (SELECT COALESCE(SUM(estimated_minutes), 0) FROM tasks WHERE status = 'pending') as planned_minutes
-        `).get();
+            (SELECT COUNT(*) FROM tasks WHERE user_id = ? AND status = 'pending') as pending,
+            (SELECT COUNT(*) FROM tasks WHERE user_id = ? AND status = 'completed') as completed,
+            (SELECT COUNT(*) FROM tasks WHERE user_id = ? AND status = 'pending' AND due_at < datetime('now')) as overdue,
+            (SELECT COALESCE(SUM(estimated_minutes), 0) FROM tasks WHERE user_id = ? AND status = 'pending') as planned_minutes
+        `).get(req.user.id, req.user.id, req.user.id, req.user.id);
         
         res.json(stats);
       } catch (error) {
         console.error('Error fetching stats:', error);
         res.status(500).json({ error: 'Failed to fetch stats' });
       }
-    });
-
-    // Health check
-    app.get('/api/health', (req, res) => {
-      res.json({ status: 'ok', timestamp: new Date().toISOString() });
     });
 
     // Error handling
@@ -102,6 +108,7 @@ async function start() {
     app.listen(PORT, () => {
       console.log(`Personal Reminder OS backend listening on http://localhost:${PORT}`);
       console.log(`API available at http://localhost:${PORT}/api`);
+      console.log(`Auth endpoints at http://localhost:${PORT}/api/auth`);
       
       // Start escalation check every minute
       setInterval(runEscalationCheck, 60000);
