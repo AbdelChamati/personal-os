@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getDatabase } from '../database.js';
 
 const router = express.Router();
+const VALID_CHANNELS = new Set(['in-app', 'email', 'sms']);
 
 // GET all reminders for authenticated user
 router.get('/', (req, res) => {
@@ -35,6 +36,9 @@ router.post('/', (req, res) => {
     
     if (!task_id || !scheduled_at) {
       return res.status(400).json({ error: 'task_id and scheduled_at are required' });
+    }
+    if (channel && !VALID_CHANNELS.has(channel)) {
+      return res.status(400).json({ error: 'channel must be in-app, email, or sms' });
     }
     
     const db = getDatabase();
@@ -71,6 +75,9 @@ router.patch('/:id', (req, res) => {
     }
     
     const { scheduled_at, sent_at, channel, status } = req.body;
+    if (channel && !VALID_CHANNELS.has(channel)) {
+      return res.status(400).json({ error: 'channel must be in-app, email, or sms' });
+    }
     
     db.prepare(`
       UPDATE reminders

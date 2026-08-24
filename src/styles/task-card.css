@@ -195,6 +195,70 @@
   margin-top: 12px;
 }
 
+.task-delete-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid #f1b5b5;
+  border-radius: 6px;
+  background: #fff7f7;
+}
+
+.task-delete-confirm strong {
+  color: #842029;
+}
+
+.task-delete-confirm p {
+  margin: 4px 0 0;
+  color: #7b4b4b;
+  font-size: 13px;
+}
+
+.task-delete-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.task-delete-actions button {
+  border-radius: 4px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-delete-cancel {
+  border: 1px solid #d5d9e3;
+  background: white;
+  color: #38404f;
+}
+
+.task-delete-confirm-btn {
+  border: 1px solid #b42318;
+  background: #c9362b;
+  color: white;
+}
+
+.task-delete-confirm-btn:hover {
+  background: #a9261d;
+}
+
+@media (max-width: 560px) {
+  .task-delete-confirm {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .task-delete-actions button {
+    flex: 1;
+  }
+}
+
 .task-btn {
   padding: 6px 10px;
   border: 1px solid #ddd;

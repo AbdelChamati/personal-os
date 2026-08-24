@@ -72,10 +72,22 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const updateProfile = useCallback(async (name, email) => {
+  const updateProfile = useCallback(async (name, email, phoneNumber) => {
     try {
       setError(null);
-      const result = await authApi.updateProfile(name, email);
+      const result = await authApi.updateProfile(name, email, phoneNumber);
+      setUser(result.user);
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  }, []);
+
+  const updateAvatar = useCallback(async (avatarUrl) => {
+    try {
+      setError(null);
+      const result = await authApi.updateAvatar(avatarUrl);
       setUser(result.user);
       return result;
     } catch (err) {
@@ -137,6 +149,7 @@ export function AuthProvider({ children }) {
     login,
     logout,
     updateProfile,
+    updateAvatar,
     changePassword,
     forgotPassword,
     resetPassword,

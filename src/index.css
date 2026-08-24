@@ -9,14 +9,37 @@ html, body, #root {
   height: 100%;
 }
 
+:root {
+  --page-bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-muted: #f0f0f0;
+  --text: #333333;
+  --text-muted: #666666;
+  --border: #dddddd;
+  --accent: #667eea;
+  --accent-strong: #764ba2;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --page-bg: #141a25;
+  --surface: #202938;
+  --surface-muted: #303c50;
+  --text: #f4f7fb;
+  --text-muted: #b7c2d1;
+  --border: #455268;
+  --accent: #9aa7ff;
+  --accent-strong: #c0a6ff;
+  --shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica
-    Neue', sans-serif;
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f5f7fa;
-  color: #333;
+  background: var(--page-bg);
+  color: var(--text);
 }
 
 a {

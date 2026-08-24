@@ -12,7 +12,7 @@ export function runEscalationCheck() {
   const now = new Date();
 
   // Get all pending tasks
-  const tasks = db.prepare('SELECT * FROM tasks WHERE status = "pending" AND due_at IS NOT NULL').all();
+  const tasks = db.prepare("SELECT * FROM tasks WHERE status = 'pending' AND due_at IS NOT NULL").all();
 
   tasks.forEach((task) => {
     const dueDate = new Date(task.due_at);
@@ -37,7 +37,7 @@ export function getEscalatedTasks(userId) {
   const db = getDatabase();
   return db
     .prepare(
-      'SELECT * FROM tasks WHERE user_id = ? AND status = "pending" AND escalation_level > 0 ORDER BY escalation_level DESC, due_at ASC'
+      "SELECT * FROM tasks WHERE user_id = ? AND status = 'pending' AND escalation_level > 0 ORDER BY escalation_level DESC, due_at ASC"
     )
     .all(userId);
 }

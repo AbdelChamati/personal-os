@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--page-bg);
+  color: var(--text);
 }
 
 .dashboard-container {
@@ -18,30 +19,41 @@
 }
 
 .stat-card {
-  background: white;
+  border: 1px solid transparent;
+  background: var(--surface);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   text-align: center;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.stat-card:hover,
+.stat-card.active {
+  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
 .stat-value {
   font-size: 32px;
   font-weight: bold;
-  color: #667eea;
+  color: var(--accent);
   margin-bottom: 8px;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #666;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .dashboard-content {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 360px minmax(0, 1fr);
   gap: 30px;
   max-width: 1400px;
   margin: 0 auto;
@@ -55,17 +67,17 @@
 
 .filters-section,
 .sort-section {
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .filters-section h3,
 .sort-section h3 {
   margin: 0 0 15px 0;
   font-size: 16px;
-  color: #333;
+  color: var(--text);
 }
 
 .filter-group {
@@ -76,7 +88,7 @@
 
 .filter-btn {
   padding: 10px 15px;
-  background: #f0f0f0;
+  background: var(--surface-muted);
   border: 2px solid transparent;
   border-radius: 6px;
   font-size: 14px;
@@ -86,56 +98,117 @@
 }
 
 .filter-btn:hover {
-  background: #e0e0e0;
+  filter: brightness(0.96);
 }
 
 .filter-btn.active {
-  background: #667eea;
+  background: var(--accent);
   color: white;
-  border-color: #667eea;
+  border-color: var(--accent);
 }
 
 .sort-select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
-  background: white;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .sort-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.18);
 }
 
 .main-content {
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
   padding: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .loading,
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .empty-state h2 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: var(--text);
+}
+
+.mobile-action-bar {
+  display: none;
 }
 
 @media (max-width: 768px) {
+  .dashboard-container {
+    padding: 16px 12px 92px;
+  }
+
   .dashboard-content {
     grid-template-columns: 1fr;
   }
 
   .stats-bar {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    min-height: 104px;
+    padding: 14px 10px;
+  }
+
+  .sidebar {
+    gap: 14px;
+  }
+
+  .mobile-action-bar {
+    position: fixed;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    left: 12px;
+    z-index: 120;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 7px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+  }
+
+  .mobile-action-bar button {
+    min-width: 0;
+    min-height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .mobile-action-bar button.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .mobile-action-bar .mobile-add-task {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: white;
   }
 }

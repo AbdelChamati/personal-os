@@ -1,5 +1,28 @@
 const API_BASE = '/api';
 
+async function parseAuthResponse(response, fallbackMessage) {
+  const body = await response.text();
+  let data = null;
+
+  if (body) {
+    try {
+      data = JSON.parse(body);
+    } catch {
+      throw new Error(response.ok ? 'The server returned an invalid response' : fallbackMessage);
+    }
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.error || fallbackMessage);
+  }
+
+  if (!data) {
+    throw new Error('The server returned an empty response');
+  }
+
+  return data;
+}
+
 // Auth API
 export async function register(email, password, confirmPassword, name) {
   const response = await fetch(`${API_BASE}/auth/register`, {
@@ -7,11 +30,7 @@ export async function register(email, password, confirmPassword, name) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, confirmPassword, name }),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Registration failed');
-  }
-  return response.json();
+  return parseAuthResponse(response, 'Registration failed');
 }
 
 export async function login(email, password) {
@@ -20,11 +39,7 @@ export async function login(email, password) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Login failed');
-  }
-  return response.json();
+  return parseAuthResponse(response, 'Login failed');
 }
 
 export async function logout() {
@@ -100,7 +115,7 @@ export async function resetPassword(resetToken, newPassword, confirmPassword) {
   return response.json();
 }
 
-export async function updateProfile(name, email) {
+export async function updateProfile(name, email, phoneNumber) {
   const token = localStorage.getItem('authToken');
   const response = await fetch(`${API_BASE}/auth/profile`, {
     method: 'PATCH',
@@ -108,13 +123,26 @@ export async function updateProfile(name, email) {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify({ name, email }),
+    body: JSON.stringify({ name, email, phoneNumber }),
   });
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || 'Failed to update profile');
   }
   return response.json();
+}
+
+export async function updateAvatar(avatarUrl) {
+  const token = localStorage.getItem('authToken');
+  const response = await fetch(`${API_BASE}/auth/avatar`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ avatarUrl }),
+  });
+  return parseAuthResponse(response, 'Failed to update avatar');
 }
 
 export async function deleteAccount(password) {

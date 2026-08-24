@@ -168,7 +168,7 @@ router.get('/:id', (req, res) => {
 // POST create task
 router.post('/', (req, res) => {
   try {
-    const { title, description, category, priority, estimated_minutes, due_at, expires_at, recurrence_rule } = req.body;
+    const { title, description, category, priority, estimated_minutes, due_at, expires_at, recurrence_rule, reminder } = req.body;
     
     // Validation
     if (!title || title.trim() === '') {
@@ -182,30 +182,49 @@ router.post('/', (req, res) => {
     if (category && !VALID_CATEGORIES.has(category)) {
       return res.status(400).json({ error: 'Invalid category' });
     }
+
+    if (reminder) {
+      if (!['email', 'sms', 'in-app'].includes(reminder.channel) || !reminder.scheduled_at) {
+        return res.status(400).json({ error: 'Reminder channel and scheduled time are required' });
+      }
+      if (Number.isNaN(new Date(reminder.scheduled_at).getTime()) || new Date(reminder.scheduled_at) <= new Date()) {
+        return res.status(400).json({ error: 'Reminder time must be in the future' });
+      }
+    }
     
     const db = getDatabase();
     const now = new Date().toISOString();
     const taskId = uuidv4();
     
-    db.prepare(`
-      INSERT INTO tasks (id, user_id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      taskId,
-      req.user.id,
-      title.trim(),
-      description || null,
-      category || 'Other',
-      priority || 'medium',
-      'pending',
-      estimated_minutes || null,
-      due_at || null,
-      expires_at || null,
-      recurrence_rule || null,
-      now,
-      null,
-      0
-    );
+    const createTask = db.transaction(() => {
+      db.prepare(`
+        INSERT INTO tasks (id, user_id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        taskId,
+        req.user.id,
+        title.trim(),
+        description || null,
+        category || 'Other',
+        priority || 'medium',
+        'pending',
+        estimated_minutes || null,
+        due_at || null,
+        expires_at || null,
+        recurrence_rule || null,
+        now,
+        null,
+        0
+      );
+
+      if (reminder) {
+        db.prepare(`
+          INSERT INTO reminders (id, user_id, task_id, scheduled_at, channel, status)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `).run(uuidv4(), req.user.id, taskId, reminder.scheduled_at, reminder.channel, 'pending');
+      }
+    });
+    createTask();
     
     const task = db.prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?').get(taskId, req.user.id);
     res.status(201).json(task);
@@ -225,7 +244,7 @@ router.patch('/:id', (req, res) => {
       return res.status(404).json({ error: 'Task not found' });
     }
     
-    const { title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, escalation_level } = req.body;
+    const { title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, escalation_level, completed_at } = req.body;
     
     // Validation
     if (priority && !VALID_PRIORITIES.has(priority)) {
@@ -241,7 +260,12 @@ router.patch('/:id', (req, res) => {
     }
     
     const now = new Date().toISOString();
-    const completedAt = status === 'completed' && task.status !== 'completed' ? now : task.completed_at;
+    let completedAt = task.completed_at;
+    if (status === 'completed' && task.status !== 'completed') {
+      completedAt = now;
+    } else if (status !== undefined && status !== 'completed') {
+      completedAt = completed_at !== undefined ? completed_at : null;
+    }
     
     db.prepare(`
       UPDATE tasks

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as authApi from '../api/authApi';
 import '../styles/task-card.css';
 
 export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
+  const { t, i18n } = useTranslation();
   const [showEditForm, setShowEditForm] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
@@ -12,19 +14,20 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
   const [editDueAt, setEditDueAt] = useState(task.due_at || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handleComplete = async () => {
+  const handleToggleCompletion = async () => {
     try {
-      const updated = await authApi.completeTask(task.id);
+      const updated = task.status === 'completed'
+        ? await authApi.updateTask(task.id, { status: 'pending', completed_at: null })
+        : await authApi.completeTask(task.id);
       onTaskUpdated(updated);
     } catch (err) {
-      console.error('Failed to complete task:', err);
+      console.error('Failed to update task status:', err);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
-
     try {
       await authApi.deleteTask(task.id);
       onTaskDeleted(task.id);
@@ -90,7 +93,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              placeholder="Task title"
+              placeholder={t('taskCard.titlePlaceholder')}
               disabled={loading}
             />
           </div>
@@ -99,7 +102,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
             <textarea
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              placeholder="Description"
+              placeholder={t('taskForm.description')}
               rows="2"
               disabled={loading}
             />
@@ -107,19 +110,10 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
 
           <div className="form-row">
             <select value={editCategory} onChange={(e) => setEditCategory(e.target.value)} disabled={loading}>
-              <option value="Personal">Personal</option>
-              <option value="Professional">Professional</option>
-              <option value="Family">Family</option>
-              <option value="Home">Home</option>
-              <option value="Finance">Finance</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Health">Health</option>
-              <option value="Other">Other</option>
+              {['Personal', 'Professional', 'Family', 'Home', 'Finance', 'Shopping', 'Health', 'Other'].map((category) => <option key={category} value={category}>{t(`categories.${category}`)}</option>)}
             </select>
             <select value={editPriority} onChange={(e) => setEditPriority(e.target.value)} disabled={loading}>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              {['low', 'medium', 'high'].map((priority) => <option key={priority} value={priority}>{t(`priorities.${priority}`)}</option>)}
             </select>
           </div>
 
@@ -128,7 +122,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
               type="number"
               value={editEstimatedMinutes}
               onChange={(e) => setEditEstimatedMinutes(e.target.value)}
-              placeholder="Minutes"
+              placeholder={t('taskForm.estimatedMinutes')}
               min="1"
               disabled={loading}
             />
@@ -142,10 +136,10 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
 
           <div className="form-actions">
             <button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? t('common.saving') : t('common.save')}
             </button>
             <button type="button" onClick={() => setShowEditForm(false)} disabled={loading}>
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </form>
@@ -160,35 +154,53 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }) {
           <input
             type="checkbox"
             checked={task.status === 'completed'}
-            onChange={handleComplete}
+            onChange={handleToggleCompletion}
             className="task-checkbox"
+            aria-label={task.status === 'completed' ? t('taskCard.markPending') : t('taskCard.markCompleted')}
           />
           <h3 className="task-title">{task.title}</h3>
           <span className="task-priority">{getPriorityEmoji()}</span>
-          {isOverdue && <span className="overdue-badge">⚠️ Overdue</span>}
+          {isOverdue && <span className="overdue-badge">{t('taskCard.overdue')}</span>}
         </div>
       </div>
 
       {task.description && <p className="task-description">{task.description}</p>}
 
       <div className="task-meta">
-        <span className="task-category">{task.category}</span>
+        <span className="task-category">{t(`categories.${task.category}`, { defaultValue: task.category })}</span>
         {task.due_at && (
           <span className="task-due-date">
-            📅 {new Date(task.due_at).toLocaleDateString()} {new Date(task.due_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {new Date(task.due_at).toLocaleDateString(i18n.language)} {new Date(task.due_at).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })}
           </span>
         )}
-        {task.estimated_minutes && <span className="task-time">⏱️ {task.estimated_minutes} min</span>}
+        {task.estimated_minutes && <span className="task-time">{t('taskCard.minutes', { count: task.estimated_minutes })}</span>}
       </div>
 
       <div className="task-actions">
-        <button className="task-btn edit-btn" onClick={() => setShowEditForm(true)} title="Edit">
+        <button className="task-btn edit-btn" onClick={() => setShowEditForm(true)} title={t('taskCard.edit')} aria-label={t('taskCard.edit')}>
           ✏️
         </button>
-        <button className="task-btn delete-btn" onClick={handleDelete} title="Delete">
+        <button className="task-btn delete-btn" onClick={() => setShowDeleteConfirm(true)} title={t('taskCard.delete')} aria-label={t('taskCard.delete')}>
           🗑️
         </button>
       </div>
+
+      {showDeleteConfirm && (
+        <div className="task-delete-confirm" role="alertdialog" aria-modal="true" aria-labelledby={`delete-task-${task.id}`}>
+          <div>
+            <strong id={`delete-task-${task.id}`}>{t('taskCard.confirmDelete')}</strong>
+            <p>{t('taskCard.deleteWarning')}</p>
+          </div>
+          <div className="task-delete-actions">
+            <button type="button" className="task-delete-cancel" onClick={() => setShowDeleteConfirm(false)}>
+              {t('common.cancel')}
+            </button>
+            <button type="button" className="task-delete-confirm-btn" onClick={handleDelete}>
+              {t('taskCard.delete')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

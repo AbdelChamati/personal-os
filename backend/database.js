@@ -7,6 +7,26 @@ const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../personal-os
 
 let db = null;
 
+function addColumnIfMissing(database, table, column, definition) {
+  const columns = database.prepare(`PRAGMA table_info(${table})`).all();
+  if (!columns.some((existingColumn) => existingColumn.name === column)) {
+    database.exec(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
+  }
+}
+
+function migrateDatabase(database) {
+  addColumnIfMissing(database, 'users', 'avatar_url', 'avatar_url TEXT');
+  addColumnIfMissing(database, 'users', 'phone_number', 'phone_number TEXT');
+  addColumnIfMissing(database, 'users', 'oauth_provider', 'oauth_provider TEXT');
+  addColumnIfMissing(database, 'users', 'oauth_provider_id', 'oauth_provider_id TEXT');
+  addColumnIfMissing(database, 'tasks', 'user_id', 'user_id TEXT');
+  addColumnIfMissing(database, 'reminders', 'user_id', 'user_id TEXT');
+  addColumnIfMissing(database, 'reminders', 'created_at', 'created_at TEXT');
+  addColumnIfMissing(database, 'reminders', 'error_message', 'error_message TEXT');
+  addColumnIfMissing(database, 'reminders', 'attempts', 'attempts INTEGER DEFAULT 0');
+  addColumnIfMissing(database, 'automations', 'user_id', 'user_id TEXT');
+}
+
 export function initializeDatabase() {
   return new Promise((resolve, reject) => {
     try {
@@ -44,9 +64,7 @@ export function initializeDatabase() {
           created_at TEXT NOT NULL,
           completed_at TEXT,
           escalation_level INTEGER DEFAULT 0,
-          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-          INDEX idx_user_status (user_id, status),
-          INDEX idx_due_at (due_at)
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS reminders (
@@ -59,9 +77,7 @@ export function initializeDatabase() {
           status TEXT DEFAULT 'pending',
           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-          FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
-          INDEX idx_user_scheduled (user_id, scheduled_at),
-          INDEX idx_status (status)
+          FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS automations (
@@ -76,8 +92,7 @@ export function initializeDatabase() {
           enabled INTEGER DEFAULT 1,
           created_at TEXT NOT NULL,
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-          FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE SET NULL,
-          INDEX idx_user_enabled (user_id, enabled)
+          FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE SET NULL
         );
 
         CREATE TABLE IF NOT EXISTS automation_runs (
@@ -87,12 +102,23 @@ export function initializeDatabase() {
           completed_at TEXT,
           status TEXT DEFAULT 'pending',
           result TEXT,
-          FOREIGN KEY (automation_id) REFERENCES automations(id) ON DELETE CASCADE,
-          INDEX idx_automation_started (automation_id, started_at)
+          FOREIGN KEY (automation_id) REFERENCES automations(id) ON DELETE CASCADE
         );
 
+      `);
+
+      migrateDatabase(db);
+
+      db.exec(`
         CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_users_oauth_identity ON users(oauth_provider, oauth_provider_id);
+        CREATE INDEX IF NOT EXISTS idx_user_status ON tasks(user_id, status);
+        CREATE INDEX IF NOT EXISTS idx_due_at ON tasks(due_at);
         CREATE INDEX IF NOT EXISTS idx_tasks_user_created ON tasks(user_id, created_at);
+        CREATE INDEX IF NOT EXISTS idx_user_scheduled ON reminders(user_id, scheduled_at);
+        CREATE INDEX IF NOT EXISTS idx_status ON reminders(status);
+        CREATE INDEX IF NOT EXISTS idx_user_enabled ON automations(user_id, enabled);
+        CREATE INDEX IF NOT EXISTS idx_automation_started ON automation_runs(automation_id, started_at);
       `);
 
       console.log(`Database initialized at ${dbPath}`);

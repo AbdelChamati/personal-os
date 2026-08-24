@@ -1,4 +1,5 @@
 .auth-container {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -43,6 +44,16 @@
   border-left: 4px solid #c33;
 }
 
+.auth-success {
+  background-color: #eaf8ef;
+  color: #216e39;
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border-left: 4px solid #3c9b5f;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -79,6 +90,39 @@
 .form-group input:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
+}
+
+.password-input {
+  display: flex;
+  align-items: stretch;
+}
+
+.password-input input {
+  min-width: 0;
+  flex: 1;
+  border-radius: 6px 0 0 6px;
+}
+
+.password-toggle {
+  border: 1px solid #ddd;
+  border-left: 0;
+  border-radius: 0 6px 6px 0;
+  background: #f7f8fc;
+  color: #4656a8;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.password-toggle:hover:not(:disabled) {
+  background: #e8ebfa;
+}
+
+.password-toggle:disabled {
+  cursor: not-allowed;
+  color: #999;
 }
 
 .password-hint {
@@ -130,4 +174,172 @@
 
 .auth-footer a:hover {
   color: #764ba2;
+}
+
+.social-sign-in {
+  margin-top: 24px;
+}
+
+.social-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #778092;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.social-divider::before,
+.social-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #dde1ea;
+}
+
+.social-provider-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.social-provider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  border: 1px solid #d6dbe6;
+  border-radius: 6px;
+  background: #fff;
+  color: #273244;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.social-provider-icon {
+  flex: 0 0 auto;
+  font-size: 17px;
+}
+
+.social-provider-microsoft .social-provider-icon {
+  color: #1f78d1;
+}
+
+.social-provider-github .social-provider-icon {
+  color: #24292f;
+}
+
+.public-theme-toggle {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 6px;
+  background: rgba(18, 24, 42, 0.22);
+  color: white;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.public-theme-toggle:hover {
+  background: rgba(18, 24, 42, 0.4);
+}
+
+.social-provider:hover {
+  border-color: #667eea;
+  background: #f6f7ff;
+}
+
+.social-provider-github {
+  color: #24292f;
+}
+
+.oauth-callback {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .auth-container,
+[data-theme='dark'] .oauth-callback {
+  background: linear-gradient(135deg, #172037 0%, #30204a 100%);
+}
+
+[data-theme='dark'] .auth-card {
+  background: #202938;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.48);
+}
+
+[data-theme='dark'] .auth-header h1,
+[data-theme='dark'] .form-group label {
+  color: #f4f7fb;
+}
+
+[data-theme='dark'] .auth-header p,
+[data-theme='dark'] .auth-footer p,
+[data-theme='dark'] .password-hint,
+[data-theme='dark'] .social-divider {
+  color: #c1cad8;
+}
+
+[data-theme='dark'] .auth-success {
+  background: #183d2a;
+  color: #b9f6ca;
+  border-color: #63c981;
+}
+
+[data-theme='dark'] .form-group input,
+[data-theme='dark'] .password-toggle,
+[data-theme='dark'] .social-provider {
+  border-color: #52627a;
+  background: #18202d;
+  color: #f4f7fb;
+}
+
+[data-theme='dark'] .password-toggle:hover:not(:disabled),
+[data-theme='dark'] .social-provider:hover {
+  background: #303d55;
+  border-color: #9aa7ff;
+}
+
+[data-theme='dark'] .social-divider::before,
+[data-theme='dark'] .social-divider::after {
+  background: #52627a;
+}
+
+[data-theme='dark'] .social-provider-microsoft .social-provider-icon {
+  color: #75b7ff;
+}
+
+[data-theme='dark'] .social-provider-github .social-provider-icon {
+  color: #f4f7fb;
+}
+
+@media (max-width: 430px) {
+  .public-theme-toggle {
+    top: 12px;
+    right: 12px;
+  }
+
+  .auth-container {
+    align-items: flex-start;
+    padding-top: 76px;
+  }
+
+  .social-provider-list {
+    grid-template-columns: 1fr;
+  }
 }

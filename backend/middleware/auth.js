@@ -17,7 +17,7 @@ export function authMiddleware(req, res, next) {
     }
     
     const db = getDatabase();
-    const user = db.prepare('SELECT id, email, name FROM users WHERE id = ?').get(decoded.userId);
+    const user = db.prepare('SELECT id, email, name, avatar_url, phone_number FROM users WHERE id = ?').get(decoded.userId);
     
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
@@ -41,7 +41,7 @@ export function optionalAuthMiddleware(req, res, next) {
       
       if (decoded) {
         const db = getDatabase();
-        const user = db.prepare('SELECT id, email, name FROM users WHERE id = ?').get(decoded.userId);
+        const user = db.prepare('SELECT id, email, name, avatar_url, phone_number FROM users WHERE id = ?').get(decoded.userId);
         if (user) {
           req.user = user;
         }

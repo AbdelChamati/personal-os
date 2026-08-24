@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import * as authApi from '../api/authApi';
 import Header from '../components/Header';
@@ -8,11 +9,13 @@ import '../styles/dashboard.css';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, pending, completed
+  const [filter, setFilter] = useState('all'); // all, pending, completed, overdue
   const [sortBy, setSortBy] = useState('priority'); // priority, dueDate, created
+  const [openTaskFormSignal, setOpenTaskFormSignal] = useState(0);
 
   useEffect(() => {
     fetchTasks();
@@ -63,6 +66,9 @@ export default function Dashboard() {
       filtered = filtered.filter(t => t.status === 'pending');
     } else if (filter === 'completed') {
       filtered = filtered.filter(t => t.status === 'completed');
+    } else if (filter === 'overdue') {
+      const now = new Date();
+      filtered = filtered.filter((task) => task.status === 'pending' && task.due_at && new Date(task.due_at) < now);
     }
 
     return filtered;
@@ -98,22 +104,22 @@ export default function Dashboard() {
         {/* Stats Bar */}
         {stats && (
           <div className="stats-bar">
-            <div className="stat-card">
+            <button type="button" className={`stat-card ${filter === 'pending' ? 'active' : ''}`} onClick={() => setFilter('pending')} title={t('dashboard.showPending')}>
               <div className="stat-value">{stats.pending}</div>
-              <div className="stat-label">Pending</div>
-            </div>
-            <div className="stat-card">
+              <div className="stat-label">{t('stats.pending')}</div>
+            </button>
+            <button type="button" className={`stat-card ${filter === 'completed' ? 'active' : ''}`} onClick={() => setFilter('completed')} title={t('dashboard.showCompleted')}>
               <div className="stat-value">{stats.completed}</div>
-              <div className="stat-label">Completed</div>
-            </div>
-            <div className="stat-card">
+              <div className="stat-label">{t('stats.completed')}</div>
+            </button>
+            <button type="button" className={`stat-card ${filter === 'overdue' ? 'active' : ''}`} onClick={() => setFilter('overdue')} title={t('dashboard.showOverdue')}>
               <div className="stat-value">{stats.overdue}</div>
-              <div className="stat-label">Overdue</div>
-            </div>
-            <div className="stat-card">
+              <div className="stat-label">{t('stats.overdue')}</div>
+            </button>
+            <button type="button" className={`stat-card ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')} title={t('dashboard.showAll')}>
               <div className="stat-value">{stats.planned_minutes}</div>
-              <div className="stat-label">Minutes Planned</div>
-            </div>
+              <div className="stat-label">{t('stats.plannedMin')}</div>
+            </button>
           </div>
         )}
 
@@ -121,38 +127,44 @@ export default function Dashboard() {
         <div className="dashboard-content">
           {/* Sidebar */}
           <aside className="sidebar">
-            <TaskForm onTaskCreated={handleTaskCreated} />
+            <TaskForm onTaskCreated={handleTaskCreated} openSignal={openTaskFormSignal} />
 
             <div className="filters-section">
-              <h3>Filter</h3>
+              <h3>{t('header.today')}</h3>
               <div className="filter-group">
                 <button
                   className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
                   onClick={() => setFilter('all')}
                 >
-                  All Tasks
+                  {t('today.filters.all')}
                 </button>
                 <button
                   className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
                   onClick={() => setFilter('pending')}
                 >
-                  Pending
+                  {t('stats.pending')}
                 </button>
                 <button
                   className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
                   onClick={() => setFilter('completed')}
                 >
-                  Completed
+                  {t('stats.completed')}
+                </button>
+                <button
+                  className={`filter-btn ${filter === 'overdue' ? 'active' : ''}`}
+                  onClick={() => setFilter('overdue')}
+                >
+                  {t('stats.overdue')}
                 </button>
               </div>
             </div>
 
             <div className="sort-section">
-              <h3>Sort By</h3>
+              <h3>{t('dashboard.sortBy')}</h3>
               <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-select">
-                <option value="priority">Priority</option>
-                <option value="dueDate">Due Date</option>
-                <option value="created">Recently Created</option>
+                <option value="priority">{t('dashboard.priority')}</option>
+                <option value="dueDate">{t('dashboard.dueDate')}</option>
+                <option value="created">{t('dashboard.recentlyCreated')}</option>
               </select>
             </div>
           </aside>
@@ -160,11 +172,11 @@ export default function Dashboard() {
           {/* Main Area */}
           <main className="main-content">
             {loading ? (
-              <div className="loading">Loading tasks...</div>
+              <div className="loading">{t('dashboard.loadingTasks')}</div>
             ) : sortedTasks.length === 0 ? (
               <div className="empty-state">
-                <h2>No tasks yet</h2>
-                <p>Create your first task to get started!</p>
+                <h2>{t('dashboard.noTasks')}</h2>
+                <p>{t('dashboard.noTasksHint')}</p>
               </div>
             ) : (
               <TaskList
@@ -176,6 +188,13 @@ export default function Dashboard() {
           </main>
         </div>
       </div>
+
+      <nav className="mobile-action-bar" aria-label={t('dashboard.quickActions')}>
+        <button type="button" className={filter === 'all' ? 'active' : ''} onClick={() => setFilter('all')}>{t('today.filters.all')}</button>
+        <button type="button" className={filter === 'overdue' ? 'active' : ''} onClick={() => setFilter('overdue')}>{t('today.filters.overdue')}</button>
+        <button type="button" className={filter === 'completed' ? 'active' : ''} onClick={() => setFilter('completed')}>{t('today.filters.completed')}</button>
+        <button type="button" className="mobile-add-task" onClick={() => setOpenTaskFormSignal((signal) => signal + 1)}>{t('quickCapture.addTask')}</button>
+      </nav>
     </div>
   );
 }
