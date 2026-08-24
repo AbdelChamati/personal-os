@@ -10,11 +10,11 @@ const VALID_PRIORITIES = new Set(['low', 'medium', 'high']);
 const VALID_STATUSES = new Set(['pending', 'completed', 'archived']);
 const VALID_CATEGORIES = new Set(['Personal', 'Professional', 'Family', 'Home', 'Finance', 'Shopping', 'Health', 'Other']);
 
-// GET all tasks
+// GET all tasks for authenticated user
 router.get('/', (req, res) => {
   try {
     const db = getDatabase();
-    const tasks = db.prepare('SELECT * FROM tasks ORDER BY created_at DESC').all();
+    const tasks = db.prepare('SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC').all(req.user.id);
     res.json(tasks);
   } catch (error) {
     console.error('Error fetching tasks:', error);
@@ -26,7 +26,7 @@ router.get('/', (req, res) => {
 router.get('/export', (req, res) => {
   try {
     const db = getDatabase();
-    const tasks = db.prepare('SELECT * FROM tasks ORDER BY created_at DESC').all();
+    const tasks = db.prepare('SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC').all(req.user.id);
     res.json({
       version: 1,
       exported_at: new Date().toISOString(),
@@ -54,7 +54,7 @@ router.post('/import', (req, res) => {
     }
 
     if (mode === 'replace') {
-      db.prepare('DELETE FROM tasks').run();
+      db.prepare('DELETE FROM tasks WHERE user_id = ?').run(req.user.id);
     }
 
     let imported = 0;
@@ -66,10 +66,11 @@ router.post('/import', (req, res) => {
       }
 
       const id = inputTask.id || uuidv4();
-      const existing = db.prepare('SELECT id FROM tasks WHERE id = ?').get(id);
+      const existing = db.prepare('SELECT id FROM tasks WHERE id = ? AND user_id = ?').get(id, req.user.id);
 
       const normalized = {
         id,
+        user_id: req.user.id,
         title: String(inputTask.title).trim(),
         description: inputTask.description || null,
         category: VALID_CATEGORIES.has(inputTask.category) ? inputTask.category : 'Other',
@@ -92,7 +93,7 @@ router.post('/import', (req, res) => {
         db.prepare(`
           UPDATE tasks
           SET title = ?, description = ?, category = ?, priority = ?, status = ?, estimated_minutes = ?, due_at = ?, expires_at = ?, recurrence_rule = ?, created_at = ?, completed_at = ?, escalation_level = ?
-          WHERE id = ?
+          WHERE id = ? AND user_id = ?
         `).run(
           normalized.title,
           normalized.description,
@@ -106,15 +107,17 @@ router.post('/import', (req, res) => {
           normalized.created_at,
           normalized.completed_at,
           normalized.escalation_level,
-          normalized.id
+          normalized.id,
+          req.user.id
         );
         updated += 1;
       } else {
         db.prepare(`
-          INSERT INTO tasks (id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO tasks (id, user_id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
           normalized.id,
+          normalized.user_id,
           normalized.title,
           normalized.description,
           normalized.category,
@@ -149,7 +152,7 @@ router.post('/import', (req, res) => {
 router.get('/:id', (req, res) => {
   try {
     const db = getDatabase();
-    const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
+    const task = db.prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
     
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
@@ -185,10 +188,11 @@ router.post('/', (req, res) => {
     const taskId = uuidv4();
     
     db.prepare(`
-      INSERT INTO tasks (id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tasks (id, user_id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       taskId,
+      req.user.id,
       title.trim(),
       description || null,
       category || 'Other',
@@ -203,7 +207,7 @@ router.post('/', (req, res) => {
       0
     );
     
-    const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
+    const task = db.prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?').get(taskId, req.user.id);
     res.status(201).json(task);
   } catch (error) {
     console.error('Error creating task:', error);
@@ -215,7 +219,7 @@ router.post('/', (req, res) => {
 router.patch('/:id', (req, res) => {
   try {
     const db = getDatabase();
-    const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
+    const task = db.prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
     
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
@@ -242,7 +246,7 @@ router.patch('/:id', (req, res) => {
     db.prepare(`
       UPDATE tasks
       SET title = ?, description = ?, category = ?, priority = ?, status = ?, estimated_minutes = ?, due_at = ?, expires_at = ?, recurrence_rule = ?, escalation_level = ?, completed_at = ?
-      WHERE id = ?
+      WHERE id = ? AND user_id = ?
     `).run(
       title !== undefined ? title : task.title,
       description !== undefined ? description : task.description,
@@ -255,16 +259,17 @@ router.patch('/:id', (req, res) => {
       recurrence_rule !== undefined ? recurrence_rule : task.recurrence_rule,
       escalation_level !== undefined ? escalation_level : task.escalation_level,
       completedAt,
-      req.params.id
+      req.params.id,
+      req.user.id
     );
     
     // Handle recurring tasks
     if (status === 'completed' && task.recurrence_rule) {
-      const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
+      const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
       createNextOccurrence(updatedTask);
     }
     
-    const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
+    const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
     res.json(updatedTask);
   } catch (error) {
     console.error('Error updating task:', error);
@@ -276,13 +281,13 @@ router.patch('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   try {
     const db = getDatabase();
-    const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
+    const task = db.prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
     
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
     
-    db.prepare('DELETE FROM tasks WHERE id = ?').run(req.params.id);
+    db.prepare('DELETE FROM tasks WHERE id = ? AND user_id = ?').run(req.params.id, req.user.id);
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting task:', error);
