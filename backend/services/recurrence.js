@@ -1,79 +1,71 @@
-import { v4 as uuidv4 } from 'uuid';
 import { getDatabase } from '../database.js';
+import { v4 as uuidv4 } from 'uuid';
 
-const RECURRENCE_TYPES = ['daily', 'weekly', 'monthly'];
-
-export function parseRecurrenceRule(rule) {
-  if (!rule || !RECURRENCE_TYPES.includes(rule)) return null;
-  return rule;
-}
-
-export function calculateNextOccurrence(task, completedAt) {
-  if (!task.recurrence_rule) return null;
-  
-  const completed = new Date(completedAt);
-  const next = new Date(completed);
-  
-  switch (task.recurrence_rule) {
-    case 'daily':
-      next.setDate(next.getDate() + 1);
-      break;
-    case 'weekly':
-      next.setDate(next.getDate() + 7);
-      break;
-    case 'monthly':
-      next.setMonth(next.getMonth() + 1);
-      break;
-    default:
-      return null;
-  }
-  
-  return next.toISOString();
-}
+const RECURRENCE_PATTERNS = {
+  daily: (date) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + 1);
+    return next;
+  },
+  weekly: (date) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + 7);
+    return next;
+  },
+  biweekly: (date) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + 14);
+    return next;
+  },
+  monthly: (date) => {
+    const next = new Date(date);
+    next.setMonth(next.getMonth() + 1);
+    return next;
+  },
+  yearly: (date) => {
+    const next = new Date(date);
+    next.setFullYear(next.getFullYear() + 1);
+    return next;
+  },
+};
 
 export function createNextOccurrence(task) {
-  if (!task.recurrence_rule || task.status !== 'completed') {
-    return null;
-  }
-  
-  const nextDueAt = calculateNextOccurrence(task, task.completed_at);
-  if (!nextDueAt) return null;
-  
+  if (!task.recurrence_rule) return null;
+
+  const pattern = RECURRENCE_PATTERNS[task.recurrence_rule];
+  if (!pattern) return null;
+
   const db = getDatabase();
-  const newTask = {
-    id: uuidv4(),
-    title: task.title,
-    description: task.description,
-    category: task.category,
-    priority: task.priority,
-    status: 'pending',
-    estimated_minutes: task.estimated_minutes,
-    due_at: nextDueAt,
-    expires_at: task.expires_at ? new Date(new Date(task.expires_at).getTime() + 24 * 60 * 60 * 1000).toISOString() : null,
-    recurrence_rule: task.recurrence_rule,
-    created_at: new Date().toISOString(),
-    completed_at: null,
-    escalation_level: 0,
-  };
-  
+  const dueDate = task.due_at ? new Date(task.due_at) : new Date();
+  const nextDueDate = pattern(dueDate);
+
+  const newTaskId = uuidv4();
+  const now = new Date().toISOString();
+
   db.prepare(`
-    INSERT INTO tasks (id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO tasks (id, user_id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
-    newTask.id,
-    newTask.title,
-    newTask.description,
-    newTask.category,
-    newTask.priority,
-    newTask.status,
-    newTask.estimated_minutes,
-    newTask.due_at,
-    newTask.expires_at,
-    newTask.recurrence_rule,
-    newTask.created_at,
-    newTask.completed_at,
-    newTask.escalation_level
+    newTaskId,
+    task.user_id,
+    task.title,
+    task.description,
+    task.category,
+    task.priority,
+    'pending',
+    task.estimated_minutes,
+    nextDueDate.toISOString(),
+    task.expires_at,
+    task.recurrence_rule,
+    now,
+    null,
+    0
   );
-  
-  return newTask;
+
+  return db.prepare('SELECT * FROM tasks WHERE id = ?').get(newTaskId);
+}
+
+export function getRecurringTasks(userId) {
+  const db = getDatabase();
+  return db.prepare('SELECT * FROM tasks WHERE user_id = ? AND recurrence_rule IS NOT NULL AND status = "pending"').all(userId);
 }

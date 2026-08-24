@@ -1,49 +1,43 @@
 import { getDatabase } from '../database.js';
 
+const ESCALATION_RULES = [
+  { hours: 24, level: 1, label: 'Due in 24 hours' },
+  { hours: 12, level: 2, label: 'Due in 12 hours' },
+  { hours: 6, level: 3, label: 'Due in 6 hours' },
+  { hours: 0, level: 4, label: 'Overdue' },
+];
+
 export function runEscalationCheck() {
   const db = getDatabase();
   const now = new Date();
-  
-  // Find pending tasks
-  const pendingTasks = db.prepare(`
-    SELECT * FROM tasks WHERE status = 'pending'
-  `).all();
-  
-  for (const task of pendingTasks) {
-    if (!task.due_at) continue;
-    
+
+  // Get all pending tasks
+  const tasks = db.prepare('SELECT * FROM tasks WHERE status = "pending" AND due_at IS NOT NULL').all();
+
+  tasks.forEach((task) => {
     const dueDate = new Date(task.due_at);
-    const isOverdue = dueDate < now;
-    
-    if (!isOverdue) continue;
-    
-    // Increase escalation level gradually
-    let newLevel = task.escalation_level || 0;
-    const diffMs = now - dueDate;
-    const hrsOverdue = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    // Escalate based on how overdue
-    if (hrsOverdue >= 24) {
-      newLevel = Math.min(3, 3); // Level 3 for very overdue
-    } else if (hrsOverdue >= 4) {
-      newLevel = Math.min(2, 3);
-    } else if (hrsOverdue >= 1) {
-      newLevel = Math.min(1, 3);
+    const hoursUntilDue = (dueDate - now) / (1000 * 60 * 60);
+
+    let escalationLevel = 0;
+
+    for (const rule of ESCALATION_RULES) {
+      if (hoursUntilDue <= rule.hours) {
+        escalationLevel = rule.level;
+        break;
+      }
     }
-    
-    // Don't update if already at max level to avoid unnecessary writes
-    if (newLevel !== task.escalation_level) {
-      db.prepare(`
-        UPDATE tasks SET escalation_level = ? WHERE id = ?
-      `).run(newLevel, task.id);
+
+    if (escalationLevel !== task.escalation_level) {
+      db.prepare('UPDATE tasks SET escalation_level = ? WHERE id = ?').run(escalationLevel, task.id);
     }
-  }
-  
-  // Auto-archive tasks past their expiration date
-  db.prepare(`
-    UPDATE tasks
-    SET status = 'archived'
-    WHERE status = 'pending'
-      AND expires_at < datetime('now')
-  `).run();
+  });
+}
+
+export function getEscalatedTasks(userId) {
+  const db = getDatabase();
+  return db
+    .prepare(
+      'SELECT * FROM tasks WHERE user_id = ? AND status = "pending" AND escalation_level > 0 ORDER BY escalation_level DESC, due_at ASC'
+    )
+    .all(userId);
 }

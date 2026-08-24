@@ -1,8 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import 'dotenv/config';
 import { initializeDatabase, getDatabase } from './database.js';
 import authRouter from './routes/auth.js';
 import tasksRouter from './routes/tasks.js';
@@ -106,12 +106,14 @@ async function start() {
 
     // Start server
     app.listen(PORT, () => {
-      console.log(`Personal Reminder OS backend listening on http://localhost:${PORT}`);
-      console.log(`API available at http://localhost:${PORT}/api`);
-      console.log(`Auth endpoints at http://localhost:${PORT}/api/auth`);
+      console.log(`\n🚀 Personal Reminder OS backend listening on http://localhost:${PORT}`);
+      console.log(`📚 API available at http://localhost:${PORT}/api`);
+      console.log(`🔐 Auth endpoints at http://localhost:${PORT}/api/auth`);
+      console.log(`✅ Health check at http://localhost:${PORT}/api/health`);
       
       // Start escalation check every minute
       setInterval(runEscalationCheck, 60000);
+      console.log('⚡ Escalation check running every minute\n');
     });
   } catch (error) {
     console.error('Failed to start server:', error);
