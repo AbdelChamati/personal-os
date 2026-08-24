@@ -1,7 +1,9 @@
-node_modules/
-dist/
-*.db
-*.log
 .env
 .env.local
+.env.*.local
+node_modules/
+dist/
 .DS_Store
+.idea/
+.vscode/
+*.log
