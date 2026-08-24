@@ -23,7 +23,7 @@ export async function initializeDatabase() {
   }
   
   // Check if tables exist
-  const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='tasks'");
+  const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
   
   if (tables.length === 0) {
     createTables();
@@ -34,9 +34,27 @@ export async function initializeDatabase() {
 }
 
 function createTables() {
+  // Users table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      name TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      last_login TEXT,
+      email_verified INTEGER DEFAULT 0,
+      verification_token TEXT,
+      reset_token TEXT,
+      reset_token_expires TEXT
+    )
+  `);
+
   db.run(`
     CREATE TABLE IF NOT EXISTS tasks (
       id TEXT PRIMARY KEY,
+      user_id TEXT,
       title TEXT NOT NULL,
       description TEXT,
       category TEXT DEFAULT 'Other',
@@ -48,18 +66,21 @@ function createTables() {
       recurrence_rule TEXT,
       created_at TEXT NOT NULL,
       completed_at TEXT,
-      escalation_level INTEGER DEFAULT 0
+      escalation_level INTEGER DEFAULT 0,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `);
   
   db.run(`
     CREATE TABLE IF NOT EXISTS reminders (
       id TEXT PRIMARY KEY,
+      user_id TEXT,
       task_id TEXT NOT NULL,
       scheduled_at TEXT NOT NULL,
       sent_at TEXT,
       channel TEXT DEFAULT 'in-app',
       status TEXT DEFAULT 'pending',
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
     )
   `);
@@ -67,6 +88,7 @@ function createTables() {
   db.run(`
     CREATE TABLE IF NOT EXISTS automations (
       id TEXT PRIMARY KEY,
+      user_id TEXT,
       name TEXT NOT NULL,
       task_id TEXT,
       provider TEXT NOT NULL,
@@ -75,6 +97,7 @@ function createTables() {
       requires_approval INTEGER DEFAULT 0,
       enabled INTEGER DEFAULT 1,
       created_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
     )
   `);
@@ -102,6 +125,22 @@ function seedData() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const inThirtyMin = new Date(now.getTime() + 30 * 60 * 1000);
   
+  // Create a default demo user (for testing without login)
+  const userId = uuidv4();
+  db.run(`
+    INSERT INTO users (id, email, password_hash, name, created_at, updated_at, last_login, email_verified)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `, [
+    userId,
+    'demo@personal-os.local',
+    '$2a$10$1234567890abcdefghijklmnopqrstuvwxyz', // Placeholder hash
+    'Demo User',
+    now.toISOString(),
+    now.toISOString(),
+    now.toISOString(),
+    1
+  ]);
+
   const tasks = [
     {
       id: uuidv4(),
@@ -182,10 +221,11 @@ function seedData() {
   
   tasks.forEach(task => {
     db.run(
-      `INSERT INTO tasks (id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO tasks (id, user_id, title, description, category, priority, status, estimated_minutes, due_at, expires_at, recurrence_rule, created_at, completed_at, escalation_level)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         task.id,
+        userId,
         task.title,
         task.description,
         task.category,
@@ -202,7 +242,7 @@ function seedData() {
     );
   });
   
-  console.log('Sample data seeded');
+  console.log('Sample data seeded with demo user');
 }
 
 function saveDatabase() {
