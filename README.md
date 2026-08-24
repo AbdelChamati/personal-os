@@ -139,22 +139,38 @@ Personal OS is a comprehensive task and reminder management system built with No
 
 ## 🚀 Quick Start
 
-### Backend
+Install dependencies once from the repository root:
+
 ```bash
-cd backend
 npm install
-cp .env.example .env
+npm --prefix backend install
+```
+
+Create `backend/.env` from `backend/.env.example` and provide the values needed for the features you use.
+
+### Run The App
+
+Open **two terminals** in the repository root.
+
+Terminal 1 starts the React frontend:
+
+```bash
 npm run dev
 ```
 
-### Frontend
+Terminal 2 starts the API backend:
+
 ```bash
-npm install
-npm run dev
+npm --prefix backend start
 ```
 
-Backend: http://localhost:3001
-Frontend: http://localhost:3000
+For backend auto-restart while editing server files, use this in Terminal 2 instead:
+
+```bash
+npm --prefix backend run dev
+```
+
+The frontend runs at `http://localhost:3000`. The backend runs at `http://localhost:3001`. Vite forwards frontend `/api` requests to the backend automatically.
 
 ## 🔐 Security Implementation
 
@@ -335,7 +351,6 @@ MIT License - Free to use and modify
 
 Abdel Chamati - [GitHub](https://github.com/AbdelChamati)
 
----
 
 **Made with ❤️ for task management**
 
